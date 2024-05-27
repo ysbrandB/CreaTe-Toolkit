@@ -17,8 +17,6 @@ jobs:
       BUILD_SOURCE_DIR: .
       BUILD_ARTIFACT_STAGING_DIR: build/
       BUILD_ARTIFACT_DESTINATION_DIR: /domains/ysbrand.dev/deployment/uploads/
-      SENTRY_ORG: sa-proto
-      SENTRY_PROJECT: sa-proto-website
     steps:
       - name: 🛎️ Checkout project
         uses: actions/checkout@v3
