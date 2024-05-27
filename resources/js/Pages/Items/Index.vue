@@ -3,7 +3,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import NavLink from "@/Components/NavLink.vue";
 
 defineProps<{
-    items: Item[];
+    items: any[];
 }>();
 </script>
 

@@ -9,7 +9,7 @@ import {marked} from 'marked';
 import {computed, ref} from "vue";
 
 const props = defineProps<{
-    item?: Item;
+    item?: any;
 }>();
 
 const markdown = ref(props.item?.description??"");
@@ -80,7 +80,7 @@ const submit = () => {
                 <div class="relative w-full min-w-[200px]">
                     <textarea
                         :value="form.description"
-                        @input="markdown = $event.target.value; form.description = $event.target.value;"
+                        @input="markdown = ($event.target as HTMLInputElement).value; form.description = ($event.target as HTMLInputElement).value;"
                         id="description"
                         name="description"
                         type="description"

@@ -3,7 +3,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import NavLink from "@/Components/NavLink.vue";
 
 const props = defineProps<{
-    item: Item;
+    item: any;
 }>();
 
 import {ref} from 'vue'
