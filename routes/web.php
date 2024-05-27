@@ -1,9 +1,14 @@
 <?php
 
+use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+
+Route::resource('items', ItemController::class)->except(['show']);
+//item route that takes the hashid and returns the item
+Route::get('items/{hashid}', [ItemController::class, 'show'])->name('items.show');
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
