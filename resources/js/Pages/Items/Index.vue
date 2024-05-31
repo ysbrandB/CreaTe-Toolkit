@@ -23,6 +23,8 @@ defineProps<{
                 <div
                     class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg flex !flex-row justify-between">
                     <div class="p-6 text-gray-900 dark:text-gray-100">{{ item.name }}</div>
+                    <img :src="item.photo_url" width="100" alt="item photo">
+
                     <div class="px-6 flex justify-center">
                         <NavLink class="px-6" :href="route('items.show', item.hashid)">
                             Show item

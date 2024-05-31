@@ -14,7 +14,9 @@ return new class extends Migration
         Schema::create('items', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('photo');
             $table->text('description')->nullable();
+            $table->boolean('is_actuator')->default(false);
             $table->timestamps();
         });
     }

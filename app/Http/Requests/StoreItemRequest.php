@@ -24,8 +24,8 @@ class StoreItemRequest extends FormRequest
     {
         return [
             //name and description are required
-            'name' => ['required'],
-            'description' => ['required'],
+            'name' => ['required', 'string'],
+            'description' => ['required', 'string'],
         ];
     }
 }

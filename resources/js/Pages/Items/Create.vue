@@ -9,6 +9,7 @@ import { Head, useForm } from '@inertiajs/vue3';
 const form = useForm({
     name: '',
     description: '',
+    image: '',
 });
 
 const submit = () => {
@@ -38,6 +39,14 @@ const submit = () => {
                 />
 
                 <InputError class="mt-2" :message="form.errors.name" />
+            </div>
+
+            <div class="mt-4">
+                <InputLabel for="image" value="Image" />
+
+                <input v-model="form.image" type="image" alt="image">
+
+                <InputError class="mt-2" :message="form.errors.image" />
             </div>
 
             <div class="mt-4">
