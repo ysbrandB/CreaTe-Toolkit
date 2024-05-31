@@ -15,7 +15,14 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('photo');
-            $table->text('description')->nullable();
+            $table->string('wiring_instructions');
+            $table->string('wiring_photo');
+            $table->text('description');
+            $table->text('pros');
+            $table->text('cons');
+            $table->text('hardware_considerations');
+            $table->text('software_considerations');
+            $table->text('example_code');
             $table->boolean('is_actuator')->default(false);
             $table->timestamps();
         });

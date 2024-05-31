@@ -56,6 +56,7 @@ class ItemController extends Controller
         $id = Hashids::decode($hashid);
         $item = Item::query()->where('id', $id)->firstOrFail();
         $item->hashid = $item->public_id;
+        $item->photo_url = asset('storage/photos/' . $item->photo);
         return Inertia::render('Items/Show', [
             'item' => $item,
         ]);

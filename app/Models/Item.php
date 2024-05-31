@@ -12,6 +12,13 @@ use Illuminate\Database\Eloquent\Model;
  * @property string public_id
  * @property boolean is_actuator
  * @property string photo
+ * @property string pros
+ * @property string cons
+ * @property string hardware_considerations
+ * @property string software_considerations
+ * @property string example_code
+ * @property string wiring_photo
+ * @property string wiring_instructions
  *
  */
 

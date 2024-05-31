@@ -21,10 +21,8 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
         ]);
 
-        Item::create([
-            'name' => 'Item 1',
-            'description' => 'This is item 1',
-            'is_actuator' => false,
-        ]);
+        Item::factory(10)->create();
+
+        
     }
 }
