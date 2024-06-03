@@ -8,44 +8,72 @@ import {Head, useForm} from '@inertiajs/vue3';
 import {marked} from 'marked';
 import {computed, ref} from "vue";
 import axios from "axios";
+import MarkDownTextArea from "@/Pages/Items/components/MarkDownTextArea.vue";
 
 const props = defineProps<{
     item?: {
         id: number;
-        name: string;
+        title: string;
         description: string;
+        wiring_instructions: string;
+        pros: string;
+        cons: string;
+        hardware_considerations: string;
+        software_considerations: string;
+        example_code: string;
     };
 }>();
-const photo = ref({
+const thumbnail = ref({
     name: '',
     data: null,
 });
 
-const markdown = ref(props.item?.description??"");
+const wiringPhoto = ref({
+    name: '',
+    data: null,
+});
+
+const descriptionMarkdown = ref(props.item?.description ?? "");
+const wiringMarkdown = ref(props.item?.wiring_instructions ?? "");
+const prosMarkdown = ref(props.item?.pros ?? "");
+const consMarkdown = ref(props.item?.cons ?? "");
+const hardwareMarkdown = ref(props.item?.hardware_considerations ?? "");
+const softwareMarkdown = ref(props.item?.software_considerations ?? "");
+const exampleCodeMarkdown = ref(props.item?.example_code ?? "");
+
 //computed property to convert markdown to html
 const markdownToHtml = computed(() => {
-    return marked(markdown.value);
+    return marked(descriptionMarkdown.value);
 });
 
 const form = useForm({
-    name: props.item?.name,
-    description: markdown?.value,
+    name: props.item?.title,
+    description: descriptionMarkdown?.value,
+    wiring_instructions: wiringMarkdown?.value,
+    pros: prosMarkdown?.value,
+    cons: consMarkdown?.value,
+    hardware_considerations: hardwareMarkdown?.value,
+    software_considerations: softwareMarkdown?.value,
+    example_code: exampleCodeMarkdown?.value,
 });
 
 const submit = () => {
 
     const formData = new FormData();
-    console.log(form.name, form.description, photo.value.data);
-    formData.append('name', form.name);
-    formData.append('description', form.description);
-    formData.append('photo', photo.value.data);
-    if(props.item) formData.append('_method', 'put');
+    Object.keys(form.data()).forEach(key => {
+        formData.append(key, form.data()[key]);
+    });
+    formData.append('photo', thumbnail.value.data);
+    formData.append('wiring_photo', wiringPhoto.value.data);
+    //weird put method hack to actually let laravel know this is a put request
+    if (props.item) formData.append('_method', 'put');
     console.log(...formData.entries());
     let postRoute = props.item ? route('items.update', props.item.id) : route('items.store');
     axios.post(postRoute, formData, {
         headers: {
             'Content-Type': 'multipart/form-data'
-        }})
+        }
+    })
         .then((res) => {
             console.log(res);
         });
@@ -55,8 +83,16 @@ const updatePhoto = (files) => {
     if (!files.length) return;
 
     // Store the file data
-    photo.value.data = files[0];
-    photo.value.name= files[0].name;
+    thumbnail.value.data = files[0];
+    thumbnail.value.name = files[0].name;
+}
+
+const updateWiringPhoto = (files) => {
+    if (!files.length) return;
+
+    // Store the file data
+    wiringPhoto.value.data = files[0];
+    wiringPhoto.value.name = files[0].name;
 }
 </script>
 
@@ -78,37 +114,95 @@ const updatePhoto = (files) => {
                     autofocus
                 />
 
-                <InputError class="mt-2" :message="form.errors.name"/>
+                <InputError class="mt-2" :message="form.errors.title"/>
             </div>
 
             <div class="mt-4">
-                <InputLabel for="image" value="Image"/>
+                <InputLabel for="photo" value="Photo"/>
 
                 <input type="file" accept="image/*" class="form-control-file"
+                       name="photo"
+                       required
                        @change="updatePhoto($event.target.files)"
                 >
 
-                <InputError class="mt-2" :message="form.errors.image"/>
+                <InputError class="mt-2" :message="form.errors.photo"/>
             </div>
 
             <div class="w-96 mt-4">
-                <div class="relative w-full min-w-[200px]">
-<!--                    <InputLabel for="description" value="Description"/>-->
+                <MarkDownTextArea
+                    id="description"
+                    @updateMarkdown="descriptionMarkdown = $event; form.description = $event"
+                    :markdown="descriptionMarkdown"
+                    :description="form.description"
+                    :error="form.errors.description"/>
+            </div>
 
-                    <textarea
-                        :value="form.description"
-                        @input="markdown = ($event.target as HTMLInputElement).value; form.description = ($event.target as HTMLInputElement).value;"
-                        id="description"
-                        name="description"
-                        type="description"
-                        class="peer h-full min-h-[100px] w-full resize-none rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 font-sans text-sm font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:resize-none disabled:border-0 disabled:bg-blue-gray-50"
-                        placeholder=" "></textarea>
-                    <InputError class="mt-2" :message="form.errors.description"/>
-                    <label
-                        class="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-placeholder-shown:before:border-transparent peer-placeholder-shown:after:border-transparent peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
-                        Markdown description
-                    </label>
-                </div>
+            <div class="mt-4">
+                <InputLabel for="wiring_photo" value="Wiring Photo"/>
+
+                <input type="file" accept="image/*" class="form-control-file"
+                       name="wiring_photo"
+                       required
+                       @change="updateWiringPhoto($event.target.files)"
+                >
+
+                <InputError class="mt-2" :message="form.errors.wiringPhoto"/>
+            </div>
+
+            <div class="w-96 mt-4">
+                <MarkDownTextArea
+                    id="wiring_instructions"
+                    @updateMarkdown="wiringMarkdown = $event; form.wiring_instructions = $event"
+                    :markdown="wiringMarkdown"
+                    :description="form.wiring_instructions"
+                    :error="form.errors.wiring_instructions"/>
+            </div>
+
+            <div class="w-96 mt-4">
+                <MarkDownTextArea
+                    id="pros"
+                    @updateMarkdown="prosMarkdown = $event; form.pros = $event"
+                    :markdown="prosMarkdown"
+                    :description="form.pros"
+                    :error="form.errors.pros"/>
+            </div>
+
+            <div class="w-96 mt-4">
+                <MarkDownTextArea
+                    id="cons"
+                    @updateMarkdown="consMarkdown = $event; form.cons = $event"
+                    :markdown="consMarkdown"
+                    :description="form.cons"
+                    :error="form.errors.cons"/>
+            </div>
+
+            <div class="w-96 mt-4">
+                <MarkDownTextArea
+                    id="hardware_considerations"
+                    @updateMarkdown="hardwareMarkdown = $event; form.hardware_considerations = $event"
+                    :markdown="hardwareMarkdown"
+                    :description="form.hardware_considerations"
+                    :error="form.errors.hardware_considerations"/>
+            </div>
+
+            <div class="w-96 mt-4">
+                <MarkDownTextArea
+                    id="software_considerations"
+                    @updateMarkdown="softwareMarkdown = $event; form.software_considerations = $event"
+                    :markdown="softwareMarkdown"
+                    :description="form.software_considerations"
+                    :error="form.errors.software_considerations"/>
+
+            </div>
+
+            <div class="w-96 mt-4">
+                <MarkDownTextArea
+                    id="example_code"
+                    @updateMarkdown="exampleCodeMarkdown = $event; form.example_code = $event"
+                    :markdown="exampleCodeMarkdown"
+                    :description="form.example_code"
+                    :error="form.errors.example_code"/>
             </div>
 
             <div class="flex items-center justify-end mt-4">
@@ -117,6 +211,5 @@ const updatePhoto = (files) => {
                 </PrimaryButton>
             </div>
         </form>
-        <div v-html="markdownToHtml"></div>
     </GuestLayout>
 </template>

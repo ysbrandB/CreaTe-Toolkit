@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 
@@ -18,14 +19,19 @@ class StoreItemRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array|string>
      */
     public function rules(): array
     {
         return [
-            //name and description are required
-            'name' => ['required', 'string'],
+            'title' => ['required', 'string'],
             'description' => ['required', 'string'],
+            'wiring_instructions' => ['required', 'string'],
+            'pros' => ['required', 'string'],
+            'cons' => ['required', 'string'],
+            'hardware_considerations' => ['required', 'string'],
+            'software_considerations' => ['required', 'string'],
+            'example_code' => ['required', 'string'],
         ];
     }
 }

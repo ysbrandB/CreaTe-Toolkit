@@ -15,7 +15,7 @@ const form = useForm({
 const submit = () => {
     form.post(route('items.store'), {
         onFinish: () => {
-            form.reset('name', 'description');
+            form.reset('title', 'description');
         },
     });
 };

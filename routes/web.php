@@ -8,7 +8,7 @@ use Inertia\Inertia;
 
 Route::resource('items', ItemController::class)->except(['show']);
 //item route that takes the hashid and returns the item
-Route::get('items/{hashid}', [ItemController::class, 'show'])->name('items.show');
+Route::get('items/{public_id}', [ItemController::class, 'show'])->name('items.show');
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [

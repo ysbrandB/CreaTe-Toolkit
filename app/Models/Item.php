@@ -30,11 +30,28 @@ class Item extends Model
      * @var \Illuminate\Support\HigherOrderCollectionProxy|mixed
      */
     protected $fillable = [
-        'name',
+        'title',
         'description',
+        'pros',
+        'cons',
+        'hardware_considerations',
+        'software_considerations',
+        'example_code',
         'photo',
-        'is_actuator'
+        'is_actuator',
     ];
+
+    protected $with = ['attributes'];
+    protected $appends = ['public_id', 'photo_url', 'wiring_photo_url'];
+    public function getPhotoUrlAttribute(): string
+    {
+        return asset('storage/photos/' . $this->photo);
+    }
+
+    public function getWiringPhotoUrlAttribute(): string
+    {
+        return asset('storage/photos/' . $this->wiring_photo);
+    }
 
     public function getPublicIdAttribute(): string
     {

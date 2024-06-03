@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreItemRequest;
-use App\Http\Requests\UpdateItemRequest;
+use App\Models\AttributeType;
 use App\Models\Item;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -17,10 +17,8 @@ class ItemController extends Controller
     public function index()
     {
         return Inertia::render('Items/Index', [
-            'items' => Item::all()->each(function ($item) {
-                $item->hashid = $item->public_id;
-                $item->photo_url = asset('storage/photos/' . $item->photo);
-            }),
+            'items' => Item::all(),
+            'attributeTypes' => AttributeType::with('attributes')->get(),
         ]);
     }
 
@@ -38,25 +36,22 @@ class ItemController extends Controller
     public function store(StoreItemRequest $request)
     {
         $photo = $request->file('photo');
-        $photo->storeAs( 'photos/'.$photo->hashName(), ['disk' => 'public']);
-        Item::create([
-            'name' => $request->name,
-            'description' => $request->description,
-            'photo' => $photo->hashName(),
-        ]);
-
+        $photo?->storeAs( 'photos/'.$photo->hashName(), ['disk' => 'public']);
+        $wiringPhoto = $request->file('wiring_photo');
+        $wiringPhoto?->storeAs( 'photos/'.$photo->hashName(), ['disk' => 'public']);
+        $item = Item::create($request->all());
+        $item->photo = $photo?->hashName();
+        $item->wiring_photo = $wiringPhoto?->hashName();
         return redirect(route('items.index'));
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(String $hashid)
+    public function show(String $publicId)
     {
-        $id = Hashids::decode($hashid);
+        $id = Hashids::decode($publicId);
         $item = Item::query()->where('id', $id)->firstOrFail();
-        $item->hashid = $item->public_id;
-        $item->photo_url = asset('storage/photos/' . $item->photo);
         return Inertia::render('Items/Show', [
             'item' => $item,
         ]);
@@ -81,17 +76,22 @@ class ItemController extends Controller
         $photo = $request->file('photo');
         $photo->storeAs( 'photos/'.$photo->hashName(), ['disk' => 'public']);
 
+        $photo = $request->file('wiring_photo');
+        $photo->storeAs( 'photos/'.$photo->hashName(), ['disk' => 'public']);
+
         if($item->photo){
             //delete the old photo
             Storage::disk('public')->delete('photos/' . $item->photo);
         }
-        $item->update([
-            'name' => $request->name,
-            'description' => $request->description,
-            'photo' => $photo->hashName(),
-        ]);
+        if($item->wiring_photo){
+            //delete the old photo
+            Storage::disk('public')->delete('photos/' . $item->wiring_photo);
+        }
+        $item->update($request->all());
+        $item->photo = $photo->hashName();
+        $item->wiring_photo = $photo->hashName();
         $item->save();
-        return redirect(route('items.index'));
+        return redirect()->back();
     }
 
     /**

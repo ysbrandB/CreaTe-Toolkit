@@ -2,10 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Models\Item;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Item>
+ * @extends Factory<Item>
  */
 class ItemFactory extends Factory
 {
@@ -17,16 +18,16 @@ class ItemFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->name,
+            'title' => $this->faker->name,
             'description' => $this->faker->paragraph,
-            'photo' => '8jx6c14ZVjAPDlkAFBucLNhOQxfYiuIAuUNgOJ3j.png',
+            'photo' => 'Af2XzLDwCqixQw8LcnJm5mATRiBHkXIJCVVdnGYf.jpg',
             'is_actuator' => $this->faker->boolean,
             'pros' => $this->faker->paragraph,
             'cons' => $this->faker->paragraph,
             'hardware_considerations' => $this->faker->paragraph,
             'software_considerations' => $this->faker->paragraph,
             'example_code' => $this->faker->paragraph,
-            'wiring_photo' => '8jx6c14ZVjAPDlkAFBucLNhOQxfYiuIAuUNgOJ3j.png',
+            'wiring_photo' => 'Af2XzLDwCqixQw8LcnJm5mATRiBHkXIJCVVdnGYf.jpg',
             'wiring_instructions' => $this->faker->paragraph,
         ];
     }

@@ -2,20 +2,20 @@
 
 namespace Database\Factories;
 
-use App\Models\Controller;
+use App\Models\Processor;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 
-class ControllerFactory extends Factory
+class ProcessorFactory extends Factory
 {
-    protected $model = Controller::class;
+    protected $model = Processor::class;
 
     public function definition(): array
     {
         return [
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
-            'Name' => $this->faker->name(),
+            'title' => $this->faker->name(),
             'item_id' => $this->faker->randomNumber(),
         ];
     }

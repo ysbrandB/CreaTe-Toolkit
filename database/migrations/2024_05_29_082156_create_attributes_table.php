@@ -9,13 +9,14 @@ return new class extends Migration {
     {
         Schema::create('attributes', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('description');
+            $table->string('title');
+            $table->text('description');
+            $table->foreignId('attribute_type_id');
             $table->timestamps();
         });
 
         //add new pivot table called attribute_items
-        Schema::create('attribute_items', function (Blueprint $table) {
+        Schema::create('attribute_item', function (Blueprint $table) {
             $table->id();
             $table->foreignId('attribute_id');
             $table->foreignId('item_id');
@@ -23,10 +24,17 @@ return new class extends Migration {
         });
 
         //add a new pivot table called attribute_controllers
-        Schema::create('attribute_controllers', function (Blueprint $table) {
+        Schema::create('attribute_processor', function (Blueprint $table) {
             $table->id();
             $table->foreignId('attribute_id');
             $table->foreignId('controller_id');
+            $table->timestamps();
+        });
+
+        Schema::create('attribute_types', function (Blueprint $table) {
+            $table->id();
+            $table->string('title');
+            $table->text('description');
             $table->timestamps();
         });
     }
@@ -34,7 +42,8 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::dropIfExists('attributes');
-        Schema::dropIfExists('attribute_items');
-        Schema::dropIfExists('attribute_controllers');
+        Schema::dropIfExists('attribute_item');
+        Schema::dropIfExists('attribute_processor');
+        Schema::dropIfExists('attribute_types');
     }
 };

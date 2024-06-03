@@ -10,10 +10,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property string title
+ * @property string description
  * @property HasMany item
  * @property BelongsToMany attributes
  */
-class Controller extends Model
+class Processor extends Model
 {
     use HasFactory;
 
@@ -25,6 +26,6 @@ class Controller extends Model
 
     public function attributes(): BelongsToMany
     {
-        return $this->belongsToMany(Attribute::class, 'attribute_controllers');
+        return $this->belongsToMany(Attribute::class);
     }
 }

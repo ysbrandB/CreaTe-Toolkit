@@ -1,10 +1,29 @@
 <script setup lang="ts">
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import NavLink from "@/Components/NavLink.vue";
+import OpeningCard from "@/Pages/Items/components/OpeningCard.vue";
+import OpeningComponent from "@/Pages/Items/components/OpeningComponent.vue";
+import {computed, ref} from "vue";
 
 defineProps<{
-    items: any[];
+    items: {
+        public_id: string;
+        title: string;
+        photo_url: string;
+        wiring_photo_url: string;
+    }[],
+    attributeTypes: {
+        id: number;
+        title: string;
+    }[],
 }>();
+
+const checkedAttributes = ref([])
+
+const newChecked=computed(()=>{
+    console.log(checkedAttributes.value);
+    return checkedAttributes.value
+});
 </script>
 
 <template>
@@ -18,29 +37,32 @@ defineProps<{
             </div>
         </template>
 
-        <section class="w-full h-full mx-auto border-2 border-red-600">
+        <section class="w-full h-full mx-auto">
             <div class="grid md:grid-cols-12 gap-4">
-                <div class="md:col-span-3 md:pt-0 border-2 border-blue-600">
-                    <details class="border-2 border-dashed border-stone-500 p-4 [&_svg]:open:-rotate-180">
-                        <summary class="flex cursor-pointer list-none items-center gap-4">
-                            <svg class="rotate-0 transform text-blue-700 transition-all duration-300" fill="none"
-                                 height="20" width="20" stroke="currentColor" stroke-linecap="round"
-                                 stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
-                                <polyline points="6 9 12 15 18 9"></polyline>
-                            </svg>
-                            I have keys but no doors.
-                        </summary>
-                        A keyboard.
-                    </details>
+                <div class="md:col-span-3 md:pt-0">
+                    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 pb-4">
+                        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mt-4">
+                            <div class="w-full text-2xl text-center font-semibold mt-4">Filters</div>
+                            <OpeningComponent v-for="attributeType in attributeTypes" :title="attributeType.title">
+                                <template #content>
+                                    <div v-for="attribute in attributeType.attributes" :key="attribute.id" class="pl-10">
+                                        <input type="checkbox" :id="attribute.id" :value="attribute.id" v-model="checkedAttributes">
+                                        <label :for="attribute.id">{{ attribute.title }}</label>
+                                    </div>
+                                </template>
+                            </OpeningComponent>
+                        </div>
+                    </div>
+                    {{newChecked}}
                 </div>
-                <div class="md:col-span-9 border-2 border-green-600">
+                <div class="md:col-span-9">
                     <div class="grid grid-cols-4 gap-4 mt-4">
-                        <NavLink v-for="item in items" class="px-6" :href="route('items.show', item.hashid)">
+                        <NavLink v-for="item in items" class="px-6" :href="route('items.show', item.public_id)">
                             <div
                                 class="w-full bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg flex !flex-row justify-between">
 
                                 <img :src="item.photo_url" width="100" height="100" alt="item photo">
-                                <div class="px-2">{{ item.name }}</div>
+                                <div class="px-2">{{ item.title }}</div>
                             </div>
                         </NavLink>
                     </div>
