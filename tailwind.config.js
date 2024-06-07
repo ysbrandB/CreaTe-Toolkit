@@ -9,6 +9,14 @@ export default {
         './resources/views/**/*.blade.php',
         './resources/js/**/*.vue',
     ],
+    safelist: [{
+        pattern: /bg-(red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|neutral)-(100|200|900)/,
+        variants: ['dark'],
+    }, {
+        pattern: /text-(red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|stone|neutral)-(800|300)/,
+        variants: ['dark'],
+    },
+    ],
 
     theme: {
         extend: {

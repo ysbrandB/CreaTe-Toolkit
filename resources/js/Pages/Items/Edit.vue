@@ -8,7 +8,7 @@ import {Head, useForm} from '@inertiajs/vue3';
 import {marked} from 'marked';
 import {computed, ref} from "vue";
 import axios from "axios";
-import MarkDownTextArea from "@/Pages/Items/components/MarkDownTextArea.vue";
+import MarkDownTextArea from "@/CustomComponents/MarkDownTextArea.vue";
 
 const props = defineProps<{
     item?: {
@@ -123,10 +123,10 @@ const updateWiringPhoto = (files) => {
                 <input type="file" accept="image/*" class="form-control-file"
                        name="photo"
                        required
-                       @change="updatePhoto($event.target.files)"
+                       @change="updatePhoto($event as HTMLInputElement).target.files"
                 >
 
-                <InputError class="mt-2" :message="form.errors.photo"/>
+                <InputError class="mt-2" :message="form.errors.photo??''"/>
             </div>
 
             <div class="w-96 mt-4">
@@ -135,7 +135,7 @@ const updateWiringPhoto = (files) => {
                     @updateMarkdown="descriptionMarkdown = $event; form.description = $event"
                     :markdown="descriptionMarkdown"
                     :description="form.description"
-                    :error="form.errors.description"/>
+                    :error="form.errors.description??''"/>
             </div>
 
             <div class="mt-4">
@@ -144,10 +144,10 @@ const updateWiringPhoto = (files) => {
                 <input type="file" accept="image/*" class="form-control-file"
                        name="wiring_photo"
                        required
-                       @change="updateWiringPhoto($event.target.files)"
+                       @change="updateWiringPhoto($event as HTMLInputElement).target.files"
                 >
 
-                <InputError class="mt-2" :message="form.errors.wiringPhoto"/>
+                <InputError class="mt-2" :message="form.errors.wiringPhoto??''"/>
             </div>
 
             <div class="w-96 mt-4">
@@ -156,7 +156,7 @@ const updateWiringPhoto = (files) => {
                     @updateMarkdown="wiringMarkdown = $event; form.wiring_instructions = $event"
                     :markdown="wiringMarkdown"
                     :description="form.wiring_instructions"
-                    :error="form.errors.wiring_instructions"/>
+                    :error="form.errors.wiring_instructions??''"/>
             </div>
 
             <div class="w-96 mt-4">
@@ -165,7 +165,7 @@ const updateWiringPhoto = (files) => {
                     @updateMarkdown="prosMarkdown = $event; form.pros = $event"
                     :markdown="prosMarkdown"
                     :description="form.pros"
-                    :error="form.errors.pros"/>
+                    :error="form.errors.pros??''"/>
             </div>
 
             <div class="w-96 mt-4">
@@ -174,7 +174,7 @@ const updateWiringPhoto = (files) => {
                     @updateMarkdown="consMarkdown = $event; form.cons = $event"
                     :markdown="consMarkdown"
                     :description="form.cons"
-                    :error="form.errors.cons"/>
+                    :error="form.errors.cons??''"/>
             </div>
 
             <div class="w-96 mt-4">
@@ -183,7 +183,7 @@ const updateWiringPhoto = (files) => {
                     @updateMarkdown="hardwareMarkdown = $event; form.hardware_considerations = $event"
                     :markdown="hardwareMarkdown"
                     :description="form.hardware_considerations"
-                    :error="form.errors.hardware_considerations"/>
+                    :error="form.errors.hardware_considerations??''"/>
             </div>
 
             <div class="w-96 mt-4">
@@ -192,7 +192,7 @@ const updateWiringPhoto = (files) => {
                     @updateMarkdown="softwareMarkdown = $event; form.software_considerations = $event"
                     :markdown="softwareMarkdown"
                     :description="form.software_considerations"
-                    :error="form.errors.software_considerations"/>
+                    :error="form.errors.software_considerations??''"/>
 
             </div>
 
@@ -202,7 +202,7 @@ const updateWiringPhoto = (files) => {
                     @updateMarkdown="exampleCodeMarkdown = $event; form.example_code = $event"
                     :markdown="exampleCodeMarkdown"
                     :description="form.example_code"
-                    :error="form.errors.example_code"/>
+                    :error="form.errors.example_code??''"/>
             </div>
 
             <div class="flex items-center justify-end mt-4">

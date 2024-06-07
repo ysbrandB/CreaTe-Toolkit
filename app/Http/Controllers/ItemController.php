@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreItemRequest;
 use App\Models\AttributeType;
 use App\Models\Item;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Vinkla\Hashids\Facades\Hashids;
@@ -14,10 +15,24 @@ class ItemController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $filters = $request->input('filters');
+        $items = Item::query();
+        foreach($filters ?? [] as $filterId => $values){
+            //binnen een categorie is een filter een or, tussen de categorieën is het een and
+            $items = $items->orWhereHas('attributes', function($query) use ($values){
+                $query->whereIn('attributes.id', $values);
+            });
+        }
+
+        //item a => a, c, d
+        //item b => a, b, d
+        //filter: a, c
+        //zelfde categorie => or = a of c => a and b
+        //andere categorie => and = a en c => a and c
         return Inertia::render('Items/Index', [
-            'items' => Item::all(),
+            'items' => $items->get(),
             'attributeTypes' => AttributeType::with('attributes')->get(),
         ]);
     }
@@ -36,9 +51,9 @@ class ItemController extends Controller
     public function store(StoreItemRequest $request)
     {
         $photo = $request->file('photo');
-        $photo?->storeAs( 'photos/'.$photo->hashName(), ['disk' => 'public']);
+        $photo?->storeAs('photos/' . $photo->hashName(), ['disk' => 'public']);
         $wiringPhoto = $request->file('wiring_photo');
-        $wiringPhoto?->storeAs( 'photos/'.$photo->hashName(), ['disk' => 'public']);
+        $wiringPhoto?->storeAs('photos/' . $photo->hashName(), ['disk' => 'public']);
         $item = Item::create($request->all());
         $item->photo = $photo?->hashName();
         $item->wiring_photo = $wiringPhoto?->hashName();
@@ -48,19 +63,19 @@ class ItemController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(String $publicId)
+    public function show(string $publicId)
     {
         $id = Hashids::decode($publicId);
         $item = Item::query()->where('id', $id)->firstOrFail();
         return Inertia::render('Items/Show', [
-            'item' => $item,
+            'item' => $item->with('attributes', 'attributes.attributeType')->first(),
         ]);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Int $id)
+    public function edit(int $id)
     {
         return Inertia::render('Items/Edit', [
             'item' => Item::findorFail($id),
@@ -74,16 +89,16 @@ class ItemController extends Controller
     {
         $item = Item::findOrFail($id);
         $photo = $request->file('photo');
-        $photo->storeAs( 'photos/'.$photo->hashName(), ['disk' => 'public']);
+        $photo->storeAs('photos/' . $photo->hashName(), ['disk' => 'public']);
 
         $photo = $request->file('wiring_photo');
-        $photo->storeAs( 'photos/'.$photo->hashName(), ['disk' => 'public']);
+        $photo->storeAs('photos/' . $photo->hashName(), ['disk' => 'public']);
 
-        if($item->photo){
+        if ($item->photo) {
             //delete the old photo
             Storage::disk('public')->delete('photos/' . $item->photo);
         }
-        if($item->wiring_photo){
+        if ($item->wiring_photo) {
             //delete the old photo
             Storage::disk('public')->delete('photos/' . $item->wiring_photo);
         }
@@ -99,7 +114,7 @@ class ItemController extends Controller
      */
     public function destroy(Item $item)
     {
-        if($item->photo){
+        if ($item->photo) {
             //delete the old photo
             Storage::disk('public')->delete('photos/' . $item->photo);
         }

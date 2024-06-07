@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AttributeTypeController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
@@ -8,7 +9,11 @@ use Inertia\Inertia;
 
 Route::resource('items', ItemController::class)->except(['show']);
 //item route that takes the hashid and returns the item
-Route::get('items/{public_id}', [ItemController::class, 'show'])->name('items.show');
+Route::group(['prefix' => 'items'], function () {
+    Route::get('/item/{public_id}', [ItemController::class, 'show'])->name('items.show');
+});
+
+Route::resource('attribute_types', AttributeTypeController::class);
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [

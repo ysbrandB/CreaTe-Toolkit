@@ -43,6 +43,12 @@ class Item extends Model
 
     protected $with = ['attributes'];
     protected $appends = ['public_id', 'photo_url', 'wiring_photo_url'];
+
+    public function attributes()
+    {
+        return $this->belongsToMany(Attribute::class);
+    }
+
     public function getPhotoUrlAttribute(): string
     {
         return asset('storage/photos/' . $this->photo);

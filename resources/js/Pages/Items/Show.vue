@@ -18,14 +18,22 @@ const props = defineProps<{
         attributes: {
             id: number;
             title: string;
+            color: string;
+            attribute_type:{
+                id: number;
+                title: string;
+                description: string;
+                color: string;
+            }
         }[];
     };
 }>();
 
 import {ref} from 'vue'
-import QrcodeVue, {Level, RenderAs} from 'qrcode.vue'
+import QrcodeVue from 'qrcode.vue'
 import {marked} from "marked";
-import OpeningCard from "@/Pages/Items/components/OpeningCard.vue";
+import OpeningCard from "@/CustomComponents/OpeningCard.vue";
+import Pill from "@/CustomComponents/Pill.vue";
 
 const value = ref(route('items.show', props.item.public_id))
 const description = marked(props.item.description)
@@ -47,12 +55,12 @@ const description = marked(props.item.description)
             </div>
         </template>
         <section class="w-full h-full mx-auto">
-            <div class="grid md:grid-cols-12 gap-4">
+            <div class="grid md:grid-cols-12">
                 <div class="md:col-span-9 mt-4">
 
                     <OpeningCard title="Wiring">
                         <template #content>
-                            <div class="float-right mb-4 text-black italic">
+                            <div class="float-right mb-2 text-black italic dark:text-gray-100">
                                 <img :src="item.photo_url" width="400" class="rounded-lg" alt="wiring diagram">
                                 Wiring diagram
                             </div>
@@ -91,17 +99,21 @@ const description = marked(props.item.description)
                     </OpeningCard>
                 </div>
                 <div class="md:col-span-3 md:pt-0 mt-4">
-                    <div class="sticky top-8 max-w-7xl mx-auto sm:px-6 lg:px-4">
+                    <div class="sticky top-8 max-w-7xl mx-auto sm:pr-6 lg:pr-4">
                         <div
-                            class="p-8 bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg aspect-[63/88]">
-                            <div class="font-bold text-2xl">{{ item.title }}</div>
-                            <img :src="item.photo_url" class="rounded-lg" alt="item photo">
-                            <div class="text-gray-600 text-sm mt-2">{{ item.description }}</div>
-                            <div v-for="attribute in item.attributes" :key="attribute.id" class="pl-10">
-                                <input type="checkbox" :id="attribute.id" :value="attribute.id" v-model="checkedAttributes">
-                                <label :for="attribute.id">{{ attribute.title }}</label>
+                            class="p-8 bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg aspect-[63/88] overflow-hidden">
+                            <div class="dark:text-gray-100 font-bold text-2xl mb-2">{{ item.title }}</div>
+                            <img :src="item.photo_url" class="rounded-lg w-[75%] mx-auto" alt="item photo">
+                            <div class="text-gray-600 text-sm my-2">{{ item.description }}</div>
+                            <qrcode-vue class="float-right max-w-[80px] max-h-[80px] dark:bg-gray-800 dark:text-gray-100"
+                                        :value="value" level="M"
+                                        render-as="svg"/>
+                            <div class="flex flex-wrap">
+                                <div class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 m-1 rounded-full dark:bg-blue-900 dark:text-blue-300 h-min">hallo</div>
+                                <pill v-for="attribute in item.attributes" :key="attribute.id" :color="attribute.attribute_type.color">
+                                    {{ attribute.title }}
+                                </pill>
                             </div>
-                            <qrcode-vue class="float-right float-end max-w-[80px]" :value="value" level="M" render-as="svg"/>
                         </div>
                     </div>
                 </div>

@@ -35,7 +35,12 @@ class DatabaseSeeder extends Seeder
             Attribute::factory()->count(5)
         )->create();
 
-        Item::factory()->count(10)->sequence(fn (Sequence $sequence) => ['name' => 'Name '.$sequence->index])->create();
+        Item::factory(10)->create();
+        foreach (Item::all() as $item) {
+            $item->attributes()->attach(
+                Attribute::all()->random(3)
+            );
+        }
 
 
         Processor::create([

@@ -17,6 +17,7 @@ class AttributeTypeFactory extends Factory
             'updated_at' => Carbon::now(),
             'title' => $this->faker->word(),
             'description' => $this->faker->paragraph(),
+            'color' => $this->faker->randomElement(AttributeType::$colors),
         ];
     }
 }
