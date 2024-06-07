@@ -19,21 +19,18 @@ class ItemController extends Controller
     {
         $filters = $request->input('filters');
         $items = Item::query();
-        foreach($filters ?? [] as $filterId => $values){
-            //binnen een categorie is een filter een or, tussen de categorieën is het een and
-            $items = $items->orWhereHas('attributes', function($query) use ($values){
-                $query->whereIn('attributes.id', $values);
-            });
+        foreach (json_decode($filters) ?? (object)[] as $attributeCategoryId => $attributeCategory) {
+            if ($attributeCategory->attributes) {
+                $items->whereHas('attributes', function ($query) use ($attributeCategoryId, $attributeCategory) {
+                    $query->where('attribute_type_id', $attributeCategoryId)->whereIn('attributes.id', array_column($attributeCategory->attributes, 'id'));
+                });
+            }
         }
 
-        //item a => a, c, d
-        //item b => a, b, d
-        //filter: a, c
-        //zelfde categorie => or = a of c => a and b
-        //andere categorie => and = a en c => a and c
         return Inertia::render('Items/Index', [
             'items' => $items->get(),
             'attributeTypes' => AttributeType::with('attributes')->get(),
+            'filters' => $filters,
         ]);
     }
 
@@ -65,10 +62,10 @@ class ItemController extends Controller
      */
     public function show(string $publicId)
     {
-        $id = Hashids::decode($publicId);
-        $item = Item::query()->where('id', $id)->firstOrFail();
+        $id = Hashids::decode($publicId)[0];
+        $item = Item::with('attributes', 'attributes.attributeType')->findOrFail($id);
         return Inertia::render('Items/Show', [
-            'item' => $item->with('attributes', 'attributes.attributeType')->first(),
+            'item' => $item,
         ]);
     }
 

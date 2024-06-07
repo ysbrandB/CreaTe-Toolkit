@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\HigherOrderCollectionProxy;
 use Vinkla\Hashids\Facades\Hashids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -27,7 +29,7 @@ class Item extends Model
     use HasFactory;
 
     /**
-     * @var \Illuminate\Support\HigherOrderCollectionProxy|mixed
+     * @var HigherOrderCollectionProxy|mixed
      */
     protected $fillable = [
         'title',
@@ -44,7 +46,7 @@ class Item extends Model
     protected $with = ['attributes'];
     protected $appends = ['public_id', 'photo_url', 'wiring_photo_url'];
 
-    public function attributes()
+    public function attributes(): BelongsToMany
     {
         return $this->belongsToMany(Attribute::class);
     }
@@ -63,6 +65,4 @@ class Item extends Model
     {
         return Hashids::encode($this->id);
     }
-
-
 }
