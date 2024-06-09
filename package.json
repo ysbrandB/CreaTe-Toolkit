@@ -22,6 +22,7 @@
     },
     "dependencies": {
         "marked": "^12.0.2",
-        "qrcode.vue": "^3.4.1"
+        "qrcode.vue": "^3.4.1",
+        "v-network-graph": "^0.9.15"
     }
 }

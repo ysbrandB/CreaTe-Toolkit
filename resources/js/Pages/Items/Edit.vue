@@ -41,29 +41,32 @@ const hardwareMarkdown = ref(props.item?.hardware_considerations ?? "");
 const softwareMarkdown = ref(props.item?.software_considerations ?? "");
 const exampleCodeMarkdown = ref(props.item?.example_code ?? "");
 
-//computed property to convert markdown to html
-const markdownToHtml = computed(() => {
-    return marked(descriptionMarkdown.value);
-});
+// //computed property to convert markdown to html
+// const markdownToHtml = computed(() => {
+//     return marked(descriptionMarkdown.value);
+// });
 
 const form = useForm({
-    name: props.item?.title,
-    description: descriptionMarkdown?.value,
-    wiring_instructions: wiringMarkdown?.value,
-    pros: prosMarkdown?.value,
-    cons: consMarkdown?.value,
-    hardware_considerations: hardwareMarkdown?.value,
-    software_considerations: softwareMarkdown?.value,
-    example_code: exampleCodeMarkdown?.value,
+    title: props.item?.title??'',
+    description: descriptionMarkdown?.value??'',
+    wiring_instructions: wiringMarkdown?.value??'',
+    pros: prosMarkdown?.value??'',
+    cons: consMarkdown?.value??'',
+    hardware_considerations: hardwareMarkdown?.value??'',
+    software_considerations: softwareMarkdown?.value??'',
+    example_code: exampleCodeMarkdown?.value??'',
 });
 
 const submit = () => {
 
     const formData = new FormData();
     Object.keys(form.data()).forEach(key => {
+        // @ts-ignore
         formData.append(key, form.data()[key]);
     });
+    // @ts-ignore
     formData.append('photo', thumbnail.value.data);
+    // @ts-ignore
     formData.append('wiring_photo', wiringPhoto.value.data);
     //weird put method hack to actually let laravel know this is a put request
     if (props.item) formData.append('_method', 'put');
@@ -79,7 +82,7 @@ const submit = () => {
         });
 };
 
-const updatePhoto = (files) => {
+const updatePhoto = (files: any) => {
     if (!files.length) return;
 
     // Store the file data
@@ -87,7 +90,7 @@ const updatePhoto = (files) => {
     thumbnail.value.name = files[0].name;
 }
 
-const updateWiringPhoto = (files) => {
+const updateWiringPhoto = (files: any) => {
     if (!files.length) return;
 
     // Store the file data
@@ -102,14 +105,13 @@ const updateWiringPhoto = (files) => {
 
         <form @submit.prevent="submit">
             <div>
-                <InputLabel for="name" value="Title"/>
+                <InputLabel for="title" value="Title"/>
 
                 <TextInput
-                    id="name"
+                    id="title"
                     type="text"
                     class="mt-1 block w-full"
-                    initial-value="form.name"
-                    v-model="form.name"
+                    v-model="form.title"
                     required
                     autofocus
                 />
@@ -123,10 +125,10 @@ const updateWiringPhoto = (files) => {
                 <input type="file" accept="image/*" class="form-control-file"
                        name="photo"
                        required
-                       @change="updatePhoto($event as HTMLInputElement).target.files"
+                       @change="updatePhoto(
+                           //@ts-ignore
+                           $event as HTMLInputElement).target.files"
                 >
-
-                <InputError class="mt-2" :message="form.errors.photo??''"/>
             </div>
 
             <div class="w-96 mt-4">
@@ -144,10 +146,10 @@ const updateWiringPhoto = (files) => {
                 <input type="file" accept="image/*" class="form-control-file"
                        name="wiring_photo"
                        required
-                       @change="updateWiringPhoto($event as HTMLInputElement).target.files"
+                       @change="updateWiringPhoto(
+                           //@ts-ignore
+                           $event as HTMLInputElement).target.files"
                 >
-
-                <InputError class="mt-2" :message="form.errors.wiringPhoto??''"/>
             </div>
 
             <div class="w-96 mt-4">

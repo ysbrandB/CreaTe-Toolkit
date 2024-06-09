@@ -109,7 +109,6 @@ const description = marked(props.item.description)
                                         :value="value" level="M"
                                         render-as="svg"/>
                             <div class="flex flex-wrap">
-                                <div class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 m-1 rounded-full dark:bg-blue-900 dark:text-blue-300 h-min">hallo</div>
                                 <pill v-for="attribute in item.attributes" :key="attribute.id" :color="attribute.attribute_type.color">
                                     {{ attribute.title }}
                                 </pill>

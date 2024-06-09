@@ -1,6 +1,7 @@
 <script setup lang="ts">
 
 import InputError from "@/Components/InputError.vue";
+
 const props = defineProps<{
     markdown: string
     description: string;
@@ -8,12 +9,15 @@ const props = defineProps<{
     id: string;
 }>();
 
-function capitalizeFirstLetter(string:string) {
+function capitalizeFirstLetter(string: string) {
     return string[0].toUpperCase() + string.slice(1);
 }
 
 const emit = defineEmits<{
-    updateMarkdown: (markdown: string) => void;
+    [
+    //@ts-ignore
+        updateMarkdown: (markdown: string) => void
+        ]
 }>();
 </script>
 <template>
@@ -21,7 +25,9 @@ const emit = defineEmits<{
                     <textarea
                         required
                         :value="description"
-                        @input="$emit('updateMarkdown', ($event as HTMLInputElement).target.value);"
+                        @input="$emit('updateMarkdown', (
+                               //@ts-ignore
+                            $event as HTMLInputElement).target.value);"
                         :id="id"
                         :name="id"
                         class="peer h-full min-h-[100px] w-full resize-none rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 font-sans text-sm font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:resize-none disabled:border-0 disabled:bg-blue-gray-50"
