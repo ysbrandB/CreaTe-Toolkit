@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\HigherOrderCollectionProxy;
 use Vinkla\Hashids\Facades\Hashids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -49,6 +50,11 @@ class Item extends Model
     public function attributes(): BelongsToMany
     {
         return $this->belongsToMany(Attribute::class);
+    }
+
+    public function edges(): HasMany
+    {
+        return $this->hasMany(Edge::class);
     }
 
     public function getPhotoUrlAttribute(): string

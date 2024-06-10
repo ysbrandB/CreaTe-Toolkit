@@ -8,6 +8,12 @@ import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
 import { Link } from '@inertiajs/vue3';
 
 const showingNavigationDropdown = ref(false);
+const links = [
+    { href: route('dashboard'), active: route().current('dashboard'), text: 'Dashboard' },
+    { href: route('items.index'), active: route().current('items.index'), text: 'Items' },
+    { href: route('attribute_types.index'), active: route().current('attribute_types.index'), text: 'Attribute Types' },
+    { href: route('attributes.index'), active: route().current('attributes.index'), text: 'Attributes' },
+];
 </script>
 
 <template>
@@ -28,18 +34,12 @@ const showingNavigationDropdown = ref(false);
                             </div>
 
                             <!-- Navigation Links -->
-                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
-                                    Dashboard
+                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-for="link in links">
+                                <NavLink :href="link.href" :active="link.active">
+                                    {{ link.text }}
                                 </NavLink>
                             </div>
 
-                            <!-- Items -->
-                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink :href="route('items.index')" :active="route().current('items.index')">
-                                    Items
-                                </NavLink>
-                            </div>
                         </div>
 
                         <div class="hidden sm:flex sm:items-center sm:ms-6">
@@ -118,9 +118,9 @@ const showingNavigationDropdown = ref(false);
                     :class="{ block: showingNavigationDropdown, hidden: !showingNavigationDropdown }"
                     class="sm:hidden"
                 >
-                    <div class="pt-2 pb-3 space-y-1">
-                        <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
-                            Dashboard
+                    <div class="pt-2 pb-3 space-y-1" v-for="link in links">
+                        <ResponsiveNavLink :href="link.href" :active="link.active">
+                            {{ link.text }}
                         </ResponsiveNavLink>
                     </div>
 

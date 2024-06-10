@@ -1,37 +1,51 @@
 <script setup lang="ts">
-import GuestLayout from '@/Layouts/GuestLayout.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
-import {Head, useForm} from '@inertiajs/vue3';
-import {marked} from 'marked';
+import {Head, router, useForm} from '@inertiajs/vue3';
 import {computed, ref} from "vue";
 import axios from "axios";
 import MarkDownTextArea from "@/CustomComponents/MarkDownTextArea.vue";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import Card from "@/Components/Card.vue";
+import {Attribute, AttributeType, Item} from "@/types";
+import AttributeFilter from "@/CustomComponents/AttributeFilter.vue";
 
 const props = defineProps<{
-    item?: {
-        id: number;
-        title: string;
-        description: string;
-        wiring_instructions: string;
-        pros: string;
-        cons: string;
-        hardware_considerations: string;
-        software_considerations: string;
-        example_code: string;
-    };
+    item?: Item,
+    attributeTypes: AttributeType[],
+    items: Item[],
+    myAttributes: any
 }>();
-const thumbnail = ref({
-    name: '',
-    data: null,
+
+const initialSelectedAttributes = {} as Record<string, { color:string, attributes: Attribute[]|undefined }>;
+props.myAttributes?.forEach((attributeType: AttributeType) => {
+    initialSelectedAttributes[attributeType.id.toString()] = {
+        color: attributeType.color,
+        attributes: attributeType.attributes
+    };
 });
 
-const wiringPhoto = ref({
-    name: '',
-    data: null,
+const selectedAttributes = ref<Record<string, { color:string, attributes: Attribute[]|undefined }>>(initialSelectedAttributes);
+
+
+const flattenedSelectedAttributes = computed(() => {
+    let flattened: number[] = [];
+    Object.values(selectedAttributes.value).forEach((attributeType: { attributes: Attribute[]|undefined }) => {
+        if(attributeType.attributes === undefined) return;
+        attributeType.attributes.forEach((attribute: Attribute) => {
+            flattened.push(attribute.id);
+        });
+    });
+    return flattened;
 });
+
+const selectedItems = ref<string[]>([])
+const addSelectedItem = (item: number, idx: number) => {
+    // @ts-ignore
+    selectedItems.value[idx] = item;
+}
 
 const descriptionMarkdown = ref(props.item?.description ?? "");
 const wiringMarkdown = ref(props.item?.wiring_instructions ?? "");
@@ -47,14 +61,14 @@ const exampleCodeMarkdown = ref(props.item?.example_code ?? "");
 // });
 
 const form = useForm({
-    title: props.item?.title??'',
-    description: descriptionMarkdown?.value??'',
-    wiring_instructions: wiringMarkdown?.value??'',
-    pros: prosMarkdown?.value??'',
-    cons: consMarkdown?.value??'',
-    hardware_considerations: hardwareMarkdown?.value??'',
-    software_considerations: softwareMarkdown?.value??'',
-    example_code: exampleCodeMarkdown?.value??'',
+    title: props.item?.title ?? '',
+    description: descriptionMarkdown?.value ?? '',
+    wiring_instructions: wiringMarkdown?.value ?? '',
+    pros: prosMarkdown?.value ?? '',
+    cons: consMarkdown?.value ?? '',
+    hardware_considerations: hardwareMarkdown?.value ?? '',
+    software_considerations: softwareMarkdown?.value ?? '',
+    example_code: exampleCodeMarkdown?.value ?? '',
 });
 
 const submit = () => {
@@ -68,6 +82,10 @@ const submit = () => {
     formData.append('photo', thumbnail.value.data);
     // @ts-ignore
     formData.append('wiring_photo', wiringPhoto.value.data);
+    // @ts-ignore
+    formData.append('edges', selectedItems.value ?? []);
+    // @ts-ignore
+    formData.append('attributes', flattenedSelectedAttributes.value ?? [])
     //weird put method hack to actually let laravel know this is a put request
     if (props.item) formData.append('_method', 'put');
     console.log(...formData.entries());
@@ -76,12 +94,21 @@ const submit = () => {
         headers: {
             'Content-Type': 'multipart/form-data'
         }
-    })
-        .then((res) => {
-            console.log(res);
-        });
+    }).then(() => {
+            return router.get(route('items.index'));
+        }
+    );
 };
 
+const thumbnail = ref({
+    name: '',
+    data: null,
+});
+
+const wiringPhoto = ref({
+    name: '',
+    data: null,
+});
 const updatePhoto = (files: any) => {
     if (!files.length) return;
 
@@ -100,118 +127,173 @@ const updateWiringPhoto = (files: any) => {
 </script>
 
 <template>
-    <GuestLayout>
-        <Head title="Update item"/>
+    <AuthenticatedLayout>
+        <form @submit.prevent="submit" class="m-4">
+            <div class="flex lg:flex-row flex-col">
+                <Card>
+                    <Head title="Update item"/>
+                    <div>
+                        <InputLabel for="title" value="Title"/>
 
-        <form @submit.prevent="submit">
-            <div>
-                <InputLabel for="title" value="Title"/>
+                        <TextInput
+                            id="title"
+                            type="text"
+                            class="mt-1 block w-full"
+                            v-model="form.title"
+                            required
+                            autofocus
+                        />
 
-                <TextInput
-                    id="title"
-                    type="text"
-                    class="mt-1 block w-full"
-                    v-model="form.title"
-                    required
-                    autofocus
-                />
+                        <InputError class="mt-2" :message="form.errors.title"/>
+                    </div>
 
-                <InputError class="mt-2" :message="form.errors.title"/>
-            </div>
+                    <div class="mt-4">
+                        <InputLabel for="photo" value="Photo"/>
 
-            <div class="mt-4">
-                <InputLabel for="photo" value="Photo"/>
+                        <img class="w-[50%] mx-auto" :src="item?.photo_url"/>
 
-                <input type="file" accept="image/*" class="form-control-file"
-                       name="photo"
-                       required
-                       @change="updatePhoto(
+                        <input type="file" accept="image/*" class="form-control-file"
+                               name="photo"
+                               @change="updatePhoto(
                            //@ts-ignore
-                           $event as HTMLInputElement).target.files"
-                >
-            </div>
+                           $event.target.files)"
+                        >
+                    </div>
 
-            <div class="w-96 mt-4">
-                <MarkDownTextArea
-                    id="description"
-                    @updateMarkdown="descriptionMarkdown = $event; form.description = $event"
-                    :markdown="descriptionMarkdown"
-                    :description="form.description"
-                    :error="form.errors.description??''"/>
-            </div>
+                    <div class="w-96 mt-4">
+                        <MarkDownTextArea
+                            id="description"
+                            @updateMarkdown="descriptionMarkdown = $event; form.description = $event"
+                            :markdown="descriptionMarkdown"
+                            :description="form.description"
+                            :error="form.errors.description??''"/>
+                    </div>
 
-            <div class="mt-4">
-                <InputLabel for="wiring_photo" value="Wiring Photo"/>
+                    <div class="mt-4">
+                        <InputLabel for="wiring_photo" value="Wiring Photo"/>
 
-                <input type="file" accept="image/*" class="form-control-file"
-                       name="wiring_photo"
-                       required
-                       @change="updateWiringPhoto(
+                        <img class="w-[50%] mx-auto" :src="item?.wiring_photo_url"/>
+
+                        <input type="file" accept="image/*" class="form-control-file"
+                               name="wiring_photo"
+                               @change="updateWiringPhoto(
                            //@ts-ignore
-                           $event as HTMLInputElement).target.files"
-                >
-            </div>
+                           $event.target.files
+)"
+                        >
+                    </div>
 
-            <div class="w-96 mt-4">
-                <MarkDownTextArea
-                    id="wiring_instructions"
-                    @updateMarkdown="wiringMarkdown = $event; form.wiring_instructions = $event"
-                    :markdown="wiringMarkdown"
-                    :description="form.wiring_instructions"
-                    :error="form.errors.wiring_instructions??''"/>
-            </div>
+                    <div class="w-96 mt-4">
+                        <MarkDownTextArea
+                            id="wiring_instructions"
+                            @updateMarkdown="wiringMarkdown = $event; form.wiring_instructions = $event"
+                            :markdown="wiringMarkdown"
+                            :description="form.wiring_instructions"
+                            :error="form.errors.wiring_instructions??''"/>
+                    </div>
 
-            <div class="w-96 mt-4">
-                <MarkDownTextArea
-                    id="pros"
-                    @updateMarkdown="prosMarkdown = $event; form.pros = $event"
-                    :markdown="prosMarkdown"
-                    :description="form.pros"
-                    :error="form.errors.pros??''"/>
-            </div>
+                    <div class="w-96 mt-4">
+                        <MarkDownTextArea
+                            id="pros"
+                            @updateMarkdown="prosMarkdown = $event; form.pros = $event"
+                            :markdown="prosMarkdown"
+                            :description="form.pros"
+                            :error="form.errors.pros??''"/>
+                    </div>
 
-            <div class="w-96 mt-4">
-                <MarkDownTextArea
-                    id="cons"
-                    @updateMarkdown="consMarkdown = $event; form.cons = $event"
-                    :markdown="consMarkdown"
-                    :description="form.cons"
-                    :error="form.errors.cons??''"/>
-            </div>
+                    <div class="w-96 mt-4">
+                        <MarkDownTextArea
+                            id="cons"
+                            @updateMarkdown="consMarkdown = $event; form.cons = $event"
+                            :markdown="consMarkdown"
+                            :description="form.cons"
+                            :error="form.errors.cons??''"/>
+                    </div>
 
-            <div class="w-96 mt-4">
-                <MarkDownTextArea
-                    id="hardware_considerations"
-                    @updateMarkdown="hardwareMarkdown = $event; form.hardware_considerations = $event"
-                    :markdown="hardwareMarkdown"
-                    :description="form.hardware_considerations"
-                    :error="form.errors.hardware_considerations??''"/>
-            </div>
+                    <div class="w-96 mt-4">
+                        <MarkDownTextArea
+                            id="hardware_considerations"
+                            @updateMarkdown="hardwareMarkdown = $event; form.hardware_considerations = $event"
+                            :markdown="hardwareMarkdown"
+                            :description="form.hardware_considerations"
+                            :error="form.errors.hardware_considerations??''"/>
+                    </div>
 
-            <div class="w-96 mt-4">
-                <MarkDownTextArea
-                    id="software_considerations"
-                    @updateMarkdown="softwareMarkdown = $event; form.software_considerations = $event"
-                    :markdown="softwareMarkdown"
-                    :description="form.software_considerations"
-                    :error="form.errors.software_considerations??''"/>
+                    <div class="w-96 mt-4">
+                        <MarkDownTextArea
+                            id="software_considerations"
+                            @updateMarkdown="softwareMarkdown = $event; form.software_considerations = $event"
+                            :markdown="softwareMarkdown"
+                            :description="form.software_considerations"
+                            :error="form.errors.software_considerations??''"/>
+                    </div>
 
-            </div>
-
-            <div class="w-96 mt-4">
-                <MarkDownTextArea
-                    id="example_code"
-                    @updateMarkdown="exampleCodeMarkdown = $event; form.example_code = $event"
-                    :markdown="exampleCodeMarkdown"
-                    :description="form.example_code"
-                    :error="form.errors.example_code??''"/>
-            </div>
-
-            <div class="flex items-center justify-end mt-4">
-                <PrimaryButton class="ms-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                    Update item
-                </PrimaryButton>
+                    <div class="w-96 mt-4">
+                        <MarkDownTextArea
+                            id="example_code"
+                            @updateMarkdown="exampleCodeMarkdown = $event; form.example_code = $event"
+                            :markdown="exampleCodeMarkdown"
+                            :description="form.example_code"
+                            :error="form.errors.example_code??''"/>
+                    </div>
+                </Card>
+                <card>
+                    <div class="w-96 mt-4 text-center">
+                        <attribute-filter
+                            title="attributes"
+                            :attribute-types="props.attributeTypes"
+                            :checked-attributes="initialSelectedAttributes"
+                            @update:checked-attributes="selectedAttributes=$event;"/>
+                    </div>
+                </card>
+                <card>
+                    <div class="w-96 mt-4 text-center">
+                        <div class="text-md">This item</div>
+                        <div v-for="(selectedItemId, index) in selectedItems" :key="index">
+                            <div class="text-lg font-bold">↓</div>
+                            <select
+                                :id="index.toString()"
+                                class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                                @change="addSelectedItem(
+                                    // @ts-ignore
+                                    $event.target.value, index)"
+                            >
+                                <option v-for="selectableItem in props.items"
+                                        :value="selectableItem.id"
+                                        :key="selectableItem.id"
+                                        :selected="selectedItemId === selectableItem.id.toString()">
+                                    {{ selectableItem.title }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="text-lg font-bold">↓</div>
+                        <select
+                            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                            @change="addSelectedItem(
+                                // @ts-ignore
+                                $event.target.value, selectedItems?.length??0); $event.target.value = '';"
+                        >
+                            <option value="" selected disabled hidden>Choose another block</option>
+                            <option v-for="selectableItem in props.items"
+                                    :value="selectableItem.id"
+                                    :key="selectableItem.id"
+                            >
+                                {{ selectableItem.title }}
+                            </option>
+                        </select>
+                        <div class="text-lg font-bold">↓</div>
+                        <div class="text-md">
+                            Python
+                        </div>
+                        <div class="flex items-center justify-end mt-4">
+                            <PrimaryButton class="ms-4" :class="{ 'opacity-25': form.processing }"
+                                           :disabled="form.processing">
+                                Update item
+                            </PrimaryButton>
+                        </div>
+                    </div>
+                </card>
             </div>
         </form>
-    </GuestLayout>
+    </AuthenticatedLayout>
 </template>

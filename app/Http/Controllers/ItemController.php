@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreItemRequest;
+use App\Models\Attribute;
 use App\Models\AttributeType;
 use App\Models\Item;
 use Illuminate\Http\Request;
@@ -39,7 +40,10 @@ class ItemController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Items/Edit', []);
+        return Inertia::render('Items/Edit', [
+            'items' => Item::query()->get(),
+            'attributeTypes' => AttributeType::with('attributes')->get(),
+        ]);
     }
 
     /**
@@ -51,9 +55,12 @@ class ItemController extends Controller
         $photo?->storeAs('photos/' . $photo->hashName(), ['disk' => 'public']);
         $wiringPhoto = $request->file('wiring_photo');
         $wiringPhoto?->storeAs('photos/' . $photo->hashName(), ['disk' => 'public']);
-        $item = Item::create($request->all());
+
+        $item = Item::create($request->except('attributes', 'photo', 'wiring_photo'));
+        $item->attributes()->sync(explode(',', $request->input('attributes')));
         $item->photo = $photo?->hashName();
         $item->wiring_photo = $wiringPhoto?->hashName();
+        $item->save();
         return redirect(route('items.index'));
     }
 
@@ -75,7 +82,18 @@ class ItemController extends Controller
     public function edit(int $id)
     {
         return Inertia::render('Items/Edit', [
-            'item' => Item::findorFail($id),
+            'item' => Item::with('attributes')->findorFail($id),
+            'items' => Item::query()->select('id', 'title')->get(),
+            'attributeTypes' => AttributeType::with('attributes')->get(),
+            'myAttributes' => AttributeType::whereHas('attributes', function ($attributes) use ($id) {
+                $attributes->whereHas('items', function ($query) use ($id) {
+                    $query->where('items.id', $id);
+                });
+            })->with(['attributes' => function ($attributes) use ($id) {
+                $attributes->whereHas('items', function ($query) use ($id) {
+                    $query->where('items.id', $id);
+                });
+            }])->get(),
         ]);
     }
 
@@ -85,23 +103,31 @@ class ItemController extends Controller
     public function update(StoreItemRequest $request, int $id)
     {
         $item = Item::findOrFail($id);
+
         $photo = $request->file('photo');
-        $photo->storeAs('photos/' . $photo->hashName(), ['disk' => 'public']);
+        if($photo){
+            $photo->storeAs('photos/' . $photo->hashName(), ['disk' => 'public']);
 
-        $photo = $request->file('wiring_photo');
-        $photo->storeAs('photos/' . $photo->hashName(), ['disk' => 'public']);
+            if ($item->photo) {
+                //delete the old photo
+                Storage::disk('public')->delete('photos/' . $item->photo);
+            }
+            $item->photo = $photo->hashName();
+        }
 
-        if ($item->photo) {
-            //delete the old photo
-            Storage::disk('public')->delete('photos/' . $item->photo);
+        $wiring_photo = $request->file('wiring_photo');
+        if($wiring_photo){
+            $wiring_photo->storeAs('photos/' . $wiring_photo->hashName(), ['disk' => 'public']);
+
+            if ($item->wiring_photo) {
+                //delete the old photo
+                Storage::disk('public')->delete('photos/' . $item->wiring_photo);
+            }
+            $item->wiring_photo = $wiring_photo->hashName();
         }
-        if ($item->wiring_photo) {
-            //delete the old photo
-            Storage::disk('public')->delete('photos/' . $item->wiring_photo);
-        }
-        $item->update($request->all());
-        $item->photo = $photo->hashName();
-        $item->wiring_photo = $photo->hashName();
+
+        $item->update($request->except('attributes', 'photo', 'wiring_photo'));
+        $item->attributes()->sync(explode(',', $request->input('attributes')));
         $item->save();
         return redirect()->back();
     }
@@ -115,6 +141,12 @@ class ItemController extends Controller
             //delete the old photo
             Storage::disk('public')->delete('photos/' . $item->photo);
         }
+        if ($item->wiring_photo) {
+            //delete the old photo
+            Storage::disk('public')->delete('photos/' . $item->wiring_photo);
+        }
+        $item->attributes()->detach();
+        $item->edges()->delete();
         $item->delete();
     }
 }

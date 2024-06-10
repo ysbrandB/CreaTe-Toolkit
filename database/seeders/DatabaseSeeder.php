@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Attribute;
 use App\Models\AttributeType;
+use App\Models\Edge;
 use App\Models\Item;
 use App\Models\Processor;
 use App\Models\User;
@@ -31,25 +32,48 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
         ]);
 
+        $processors = AttributeType::create(
+            [
+                'title' => 'Controllers',
+                'description' => 'All the controllers you can use to interact with the sensors and actuators',
+                'color' => 'blue',
+            ]
+        );
+
+        Attribute::create(
+            [
+                'attribute_type_id' => $processors->id,
+                'title' => 'Arduino',
+                'description' => 'A microcontroller that can be used to interact with sensors and actuators',
+            ]
+        );
+
+        Attribute::create(
+            [
+                'attribute_type_id' => $processors->id,
+                'title' => 'ESP8266',
+                'description' => 'The ESP8266 is a low-cost Wi-Fi microchip with full TCP/IP stack and microcontroller capability produced by Espressif Systems',
+            ]
+        );
+
         AttributeType::factory(10)->has(
             Attribute::factory()->count(5)
         )->create();
 
-        Item::factory(10)->create();
-        foreach (Item::all() as $item) {
+        $items = Item::factory(10)->create();
+        $attributes = Attribute::all();
+        foreach ($items as $item) {
             $item->attributes()->attach(
-                Attribute::all()->random(3)
+                $attributes->random(3)
             );
         }
 
-
-        Processor::create([
-            'name' => 'Laptop',
-            'description' => 'A portable computer',
-        ]);
-
-
-
-
+        for($i = 0; $i < sizeof($items) - 1; $i++) {
+            Edge::create([
+                'from_item_id' => $items->get($i)->id,
+                'to_item_id' => $items->get($i+1)->id,
+                'belongsto_item_id' => $items->first()->id,
+            ]);
+        }
     }
 }

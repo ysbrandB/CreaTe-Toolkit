@@ -11,18 +11,20 @@ class AttributeTypeController extends Controller
 {
     public function index()
     {
-        return Inertia::render('AttributeType/Index', [
-            'attributeTypes' => AttributeType::all(),
+        return Inertia::render('AttributeTypes/Index', [
+            'attributeTypes' => AttributeType::with('attributes')->get(),
         ]);
     }
 
     public function create()
     {
-        return Inertia::render('Attributes/Edit', ['colors' => AttributeType::$colors]);
+        return Inertia::render('AttributeTypes/Edit', ['colors' => AttributeType::$colors]);
     }
 
     public function store(Request $request)
     {
+        $id = AttributeType::create($request->all())->id;
+        return to_route('attribute_types.edit',$id);
     }
 
     public function show($id)
@@ -31,10 +33,16 @@ class AttributeTypeController extends Controller
 
     public function edit($id)
     {
+        $attributeType = AttributeType::findOrFail($id);
+        return Inertia::render('AttributeTypes/Edit',
+            ['colors' => AttributeType::$colors, 'attributeType' => $attributeType]);
     }
 
     public function update(Request $request, $id)
     {
+        $attributeType = AttributeType::findOrFail($id);
+        $attributeType->update($request->all());
+        return to_route('attribute_types.index');
     }
 
     public function destroy($id)

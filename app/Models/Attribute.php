@@ -8,12 +8,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
- * @property string name
+ * @property string title
  * @property string description
  */
 class Attribute extends Model
 {
     use HasFactory;
+
+    protected $fillable = ['title', 'description', 'attribute_type_id'];
     public function items(): BelongsToMany
     {
         return $this->belongsToMany(Item::class);

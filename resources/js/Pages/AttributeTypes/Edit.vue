@@ -5,35 +5,38 @@ import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import {Head, router, useForm} from '@inertiajs/vue3';
-import {Attribute, AttributeType} from "@/types";
+import {marked} from 'marked';
+import {computed, ref} from "vue";
+import axios from "axios";
+import MarkDownTextArea from "@/CustomComponents/MarkDownTextArea.vue";
+import {AttributeType} from "@/types";
 
 const props = defineProps<{
-    attributeTypes: AttributeType[];
-    attribute?: Attribute;
+    attributeType?: AttributeType
+    colors: string[];
 }>();
 
 const form = useForm({
-    title: props.attribute?.title ?? '',
-    description: props.attribute?.description ?? '',
-    attribute_type_id: props.attribute?.attribute_type_id ?? '',
+    title: props.attributeType?.title ?? '',
+    description: props.attributeType?.description ?? '',
+    color: props.attributeType?.color ?? '',
 });
 
-function capitalizeFirstLetter(string: string) {
+function capitalizeFirstLetter(string:string) {
     return string[0].toUpperCase() + string.slice(1);
 }
-
 const submit = () => {
-    if (props.attribute) {
-        router.put(route('attributes.update', props.attribute.id), form.data());
+    if (props.attributeType) {
+        router.put(route('attribute_types.update', props.attributeType.id), form.data());
     } else {
-        router.post(route('attributes.store'), form.data());
+        router.post(route('attribute_types.store'), form.data());
     }
 };
 </script>
 
 <template>
     <GuestLayout>
-        <Head title="Update Attribute"/>
+        <Head title="Update AttributeType"/>
 
         <form @submit.prevent="submit">
             <div>
@@ -43,6 +46,7 @@ const submit = () => {
                     id="title"
                     type="text"
                     class="mt-1 block w-full"
+                    initial-value="form.title"
                     v-model="form.title"
                     required
                     autofocus
@@ -66,24 +70,25 @@ const submit = () => {
                     </label>
                 </div>
             </div>
-            <div class="w-96 mt-4">
-                <input-label for="attribute_type_id" value="Attribute Type"/>
+
+            <div class="mt-4">
+                <InputLabel for="color" value="Color"/>
                 <select
-                    v-model="form.attribute_type_id"
-                    :class="`bg-${props.attributeTypes.find(attributeType=>attributeType.id===form.attribute_type_id)?.color}-100`"
+                    id="color"
+                    v-model="form.color"
+                    :class="`bg-${props.colors.find(color=>color===form.color)}-100`"
                     class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                 >
-                    <option :class="`bg-${attributeType.color}-100`" v-for="attributeType in props.attributeTypes"
-                            :value="attributeType.id"
-                            :key="attributeType.id">
-                        {{ attributeType.title }}
-                    </option>
+                    <option :class="`bg-${color}-100`" v-for="color in props.colors" :value="color" :key="color">
+                        {{ color }} </option>
                 </select>
+                <InputError class="mt-2" :message="form.errors.color"/>
             </div>
+
 
             <div class="flex items-center justify-end mt-4">
                 <PrimaryButton class="ms-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                    Update Attribute
+                    Update item
                 </PrimaryButton>
             </div>
         </form>

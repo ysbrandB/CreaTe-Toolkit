@@ -29,14 +29,13 @@ const props = defineProps<{
     };
 }>();
 
-import {ref} from 'vue'
 import QrcodeVue from 'qrcode.vue'
-import {marked} from "marked";
 import OpeningCard from "@/CustomComponents/OpeningCard.vue";
 import Pill from "@/CustomComponents/Pill.vue";
-
-const value = ref(route('items.show', props.item.public_id))
-const description = marked(props.item.description)
+import HighlightJSVuePlugin from '@highlightjs/vue-plugin';
+import 'highlight.js/lib/common';
+const VHighlightjs = HighlightJSVuePlugin.component;
+import 'highlight.js/styles/atom-one-dark.css';
 </script>
 
 <template>
@@ -51,6 +50,9 @@ const description = marked(props.item.description)
                 </div>
                 <NavLink class="px-6" :href="route('items.edit', item)">
                     Edit item {{ item.id }}
+                </NavLink>
+                <NavLink class="px-6" :href="route('items.destroy', item)">
+                    Delete item {{ item.id }}
                 </NavLink>
             </div>
         </template>
@@ -94,19 +96,19 @@ const description = marked(props.item.description)
 
                     <OpeningCard title="Example code">
                         <template #content>
-                            {{ item.example_code }}
+                            <v-highlightjs autodetect :code="item.example_code" />
                         </template>
                     </OpeningCard>
                 </div>
                 <div class="md:col-span-3 md:pt-0 mt-4">
                     <div class="sticky top-8 max-w-7xl mx-auto sm:pr-6 lg:pr-4">
                         <div
-                            class="p-8 bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg aspect-[63/88] overflow-hidden">
+                            class="p-8 bg-white dark:bg-gray-800 shadow-sm rounded-lg aspect-[63/88] overflow-hidden">
                             <div class="dark:text-gray-100 font-bold text-2xl mb-2">{{ item.title }}</div>
                             <img :src="item.photo_url" class="rounded-lg w-[75%] mx-auto" alt="item photo">
                             <div class="text-gray-600 text-sm my-2">{{ item.description }}</div>
                             <qrcode-vue class="float-right max-w-[80px] max-h-[80px] dark:bg-gray-800 dark:text-gray-100"
-                                        :value="value" level="M"
+                                        :value="route('items.show', props.item.public_id)" level="M"
                                         render-as="svg"/>
                             <div class="flex flex-wrap">
                                 <pill v-for="attribute in item.attributes" :key="attribute.id" :color="attribute.attribute_type.color">
