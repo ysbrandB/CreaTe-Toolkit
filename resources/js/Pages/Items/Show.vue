@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import NavLink from "@/Components/NavLink.vue";
-
 const props = defineProps<{
     item: {
         id: number;
@@ -29,14 +26,22 @@ const props = defineProps<{
     };
 }>();
 
-import QrcodeVue from 'qrcode.vue'
 import OpeningCard from "@/CustomComponents/OpeningCard.vue";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import NavLink from "@/Components/NavLink.vue";
+
+import QrcodeVue from 'qrcode.vue'
+
 import Pill from "@/CustomComponents/Pill.vue";
 import HighlightJSVuePlugin from '@highlightjs/vue-plugin';
 import 'highlight.js/lib/common';
 
 const VHighlightjs = HighlightJSVuePlugin.component;
 import 'highlight.js/styles/atom-one-dark.css';
+
+import {marked} from 'marked';
+
+const renderMarkdown = (markdown: string) => marked(markdown);
 </script>
 
 <template>
@@ -53,7 +58,7 @@ import 'highlight.js/styles/atom-one-dark.css';
                     <NavLink class="px-6" :href="route('items.edit', item)">
                         Edit item {{ item.id }}
                     </NavLink>
-                    <NavLink class="px-6" :href="route('items.destroy', item)">
+                    <NavLink class="px-6" :href="route('items.destroy', item)" method="delete">
                         Delete item {{ item.id }}
                     </NavLink>
                 </div>
@@ -66,40 +71,40 @@ import 'highlight.js/styles/atom-one-dark.css';
                     <OpeningCard title="Wiring">
                         <template #content>
                             <div class="float-right mb-2 text-black italic dark:text-gray-100">
-                                <img :src="item.photo_url" width="400" class="rounded-lg" alt="wiring diagram">
+                                <img :src="item.wiring_photo_url" width="400" class="rounded-lg" alt="wiring diagram">
                                 Wiring diagram
                             </div>
-                            {{ item.wiring_instructions }}
+                            <div v-html="renderMarkdown(item.wiring_instructions)"></div>
                         </template>
                     </OpeningCard>
 
                     <OpeningCard title="Pros">
                         <template #content>
-                            {{ item.pros }}
+                            <div v-html="renderMarkdown(item.pros)"></div>
                         </template>
                     </OpeningCard>
 
                     <OpeningCard title="Cons">
                         <template #content>
-                            {{ item.cons }}
+                            <div v-html="renderMarkdown(item.cons)"></div>
                         </template>
                     </OpeningCard>
 
                     <OpeningCard title="Hardware considerations">
                         <template #content>
-                            {{ item.cons }}
+                            <div v-html="renderMarkdown(item.hardware_considerations)"></div>
                         </template>
                     </OpeningCard>
 
                     <OpeningCard title="Software considerations">
                         <template #content>
-                            {{ item.cons }}
+                            <div v-html="renderMarkdown(item.software_considerations)"></div>
                         </template>
                     </OpeningCard>
 
                     <OpeningCard title="Example code">
                         <template #content>
-                            <v-highlightjs autodetect :code="item.example_code"/>
+                            <v-highlightjs autodetect :code="item.example_code" class="w-full"/>
                         </template>
                     </OpeningCard>
                 </div>

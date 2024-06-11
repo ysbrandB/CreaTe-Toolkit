@@ -99,7 +99,7 @@ const submit = () => {
     }).then((data) => {
             if (data.status === 200) {
                 if(props.item)
-                    return router.get(route('items.show', props.item?.public_id));
+                    return router.get(route('items.show', props.item.public_id));
                 return router.get(route('items.index'));
             }
             console.error(data?.data?.response.data);

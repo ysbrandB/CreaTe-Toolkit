@@ -4,7 +4,7 @@ import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
-import {Head, router, useForm} from '@inertiajs/vue3';
+import {Head, Link, router, useForm} from '@inertiajs/vue3';
 import {marked} from 'marked';
 import {computed, ref} from "vue";
 import axios from "axios";
@@ -87,11 +87,14 @@ const submit = () => {
             </div>
 
             <div class="flex items-center justify-between mt-4">
-                <DangerButton class="ms-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                    Delete item
-                </DangerButton>
-                <PrimaryButton class="ms-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                    Update item
+                <Link
+                    v-if="props.attributeType"
+                    :href="route('attribute_types.destroy', props.attributeType?.id)"
+                    method="delete"
+                    class="inline-flex h-full items-center w-min text-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-500 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150"
+                > Delete AttributeType </Link>
+                <PrimaryButton class="ms-4 w-min" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
+                    Update AttributeType
                 </PrimaryButton>
             </div>
         </form>

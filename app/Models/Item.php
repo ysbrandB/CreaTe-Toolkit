@@ -63,7 +63,7 @@ class Item extends Model
 
     public function edges(): HasMany
     {
-        return $this->hasMany(Edge::class);
+        return $this->hasMany(Edge::class, 'belongsto_item_id');
     }
 
     public function getPhotoUrlAttribute(): string

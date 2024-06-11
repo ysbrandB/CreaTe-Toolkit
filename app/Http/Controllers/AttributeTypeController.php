@@ -47,5 +47,12 @@ class AttributeTypeController extends Controller
 
     public function destroy($id)
     {
+        $attributeType = AttributeType::findOrFail($id);
+        foreach ($attributeType->attributes as $attribute) {
+            $attribute->items()->detach();
+            $attribute->delete();
+        }
+        $attributeType->delete();
+        return to_route('attribute_types.index');
     }
 }

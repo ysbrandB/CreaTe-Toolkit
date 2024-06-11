@@ -157,5 +157,7 @@ class ItemController extends Controller
         $item->attributes()->detach();
         $item->edges()->delete();
         $item->delete();
+
+        return to_route('items.index');
     }
 }
