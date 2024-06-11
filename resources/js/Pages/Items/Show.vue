@@ -12,6 +12,7 @@ const props = defineProps<{
         software_considerations: string;
         example_code: string;
         photo_url: string;
+        wiring_photo_url: string;
         attributes: {
             id: number;
             title: string;
