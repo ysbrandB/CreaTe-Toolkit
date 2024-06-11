@@ -20,6 +20,7 @@ class ItemFactory extends Factory
         return [
             'title' => $this->faker->name,
             'description' => $this->faker->paragraph,
+            'card_description' => $this->faker->text,
             'photo' => 'Af2XzLDwCqixQw8LcnJm5mATRiBHkXIJCVVdnGYf.jpg',
             'is_actuator' => $this->faker->boolean,
             'pros' => $this->faker->paragraph,

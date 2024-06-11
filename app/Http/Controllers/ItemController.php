@@ -144,8 +144,9 @@ class ItemController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Item $item)
+    public function destroy(int $id)
     {
+        $item = Item::findOrFail($id);
         if ($item->photo) {
             //delete the old photo
             Storage::disk('public')->delete('photos/' . $item->photo);

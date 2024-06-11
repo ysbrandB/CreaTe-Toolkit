@@ -3,7 +3,7 @@
 import InputError from "@/Components/InputError.vue";
 
 const props = defineProps<{
-    markdown: string
+    markdown?: string
     description: string;
     error: string;
     id: string;

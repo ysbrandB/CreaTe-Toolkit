@@ -1,30 +1,8 @@
 <script setup lang="ts">
+import {Item} from "@/types";
+
 const props = defineProps<{
-    item: {
-        id: number;
-        public_id: string;
-        title: string;
-        description: string;
-        wiring_instructions: string;
-        pros: string;
-        cons: string;
-        hardware_considerations: string;
-        software_considerations: string;
-        example_code: string;
-        photo_url: string;
-        wiring_photo_url: string;
-        attributes: {
-            id: number;
-            title: string;
-            color: string;
-            attribute_type: {
-                id: number;
-                title: string;
-                description: string;
-                color: string;
-            }
-        }[];
-    };
+    item: Item
 }>();
 
 import OpeningCard from "@/CustomComponents/OpeningCard.vue";
@@ -43,6 +21,7 @@ import 'highlight.js/styles/atom-one-dark.css';
 import {marked} from 'marked';
 
 const renderMarkdown = (markdown: string) => marked(markdown);
+
 </script>
 
 <template>
@@ -53,21 +32,21 @@ const renderMarkdown = (markdown: string) => marked(markdown);
                 <div>
                     <h2 class="font-semibold text-2xl font-bold text-gray-800 dark:text-gray-200 leading-tight">
                         {{ item.title }}</h2>
-
+                <div class="text-gray-600 text-sm mt-4">{{ item.description }}</div>
                 </div>
                 <div v-if="$page.props.auth.user">
-                    <NavLink class="px-6" :href="route('items.edit', item)">
+                    <NavLink class="px-6" :href="route('items.edit', item.id)">
                         Edit item {{ item.id }}
                     </NavLink>
-                    <NavLink class="px-6" :href="route('items.destroy', item)" method="delete">
+                    <NavLink class="px-6" :href="route('items.destroy', item.id)" method="delete">
                         Delete item {{ item.id }}
                     </NavLink>
                 </div>
             </div>
         </template>
         <section class="w-full h-full mx-auto">
-            <div class="grid md:grid-cols-12">
-                <div class="md:col-span-9 mt-4">
+            <div class="grid grid-cols-3 md:grid-cols-12">
+                <div class="col-span-3 md:col-span-9 mt-4">
 
                     <OpeningCard title="Wiring">
                         <template #content>
@@ -105,24 +84,28 @@ const renderMarkdown = (markdown: string) => marked(markdown);
 
                     <OpeningCard title="Example code">
                         <template #content>
-                            <v-highlightjs autodetect :code="item.example_code" class="w-full"/>
+                            <v-highlightjs autodetect :code="item.example_code" class="w-full sm:text-sm"/>
                         </template>
                     </OpeningCard>
                 </div>
-                <div class="md:col-span-3 md:pt-0 mt-4">
-                    <div class="sticky top-8 max-w-7xl mx-auto sm:pr-6 lg:pr-4">
+                <div class="col-span-3 md:pt-0 mt-4">
+                    <div class="sticky top-8 max-w-7xl mx-auto sm:pr-6 lg:pr-4" id="wrapper">
                         <div
+                            id="resizeCard"
                             class="p-8 bg-white dark:bg-gray-800 shadow-sm rounded-lg aspect-[63/88] overflow-hidden">
                             <div class="dark:text-gray-100 font-bold text-2xl mb-2">{{ item.title }}</div>
                             <img :src="item.photo_url" class="rounded-lg w-[75%] mx-auto" alt="item photo">
-                            <div class="text-gray-600 text-sm my-2">{{ item.description }}</div>
+                            <div class="text-gray-600 text-sm my-2">{{ item.card_description }}</div>
                             <qrcode-vue
-                                class="float-right max-w-[80px] max-h-[80px] dark:bg-gray-800 dark:text-gray-100"
-                                :value="route('items.show', props.item.public_id)" level="M"
-                                render-as="svg"/>
+                                class="float-right max-w-[80px] max-h-[80px] dark:bg-gray-800 dark:text-gray-100 m-2"
+                                :value="route('items.show', props.item.public_id)"
+                                :margin="2"
+                                :size="500"
+                                level="Q"
+                                render-as="canvas"/>
                             <div class="flex flex-wrap">
                                 <pill v-for="attribute in item.attributes" :key="attribute.id"
-                                      :color="attribute.attribute_type.color">
+                                      :color="attribute.attribute_type?.color??''">
                                     {{ attribute.title }}
                                 </pill>
                             </div>

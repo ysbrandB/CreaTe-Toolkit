@@ -47,32 +47,19 @@ const addSelectedItem = (item: number, idx: number) => {
     form.edges[idx] = item;
 }
 
-const descriptionMarkdown = ref(props.item?.description ?? "");
-const wiringMarkdown = ref(props.item?.wiring_instructions ?? "");
-const prosMarkdown = ref(props.item?.pros ?? "");
-const consMarkdown = ref(props.item?.cons ?? "");
-const hardwareMarkdown = ref(props.item?.hardware_considerations ?? "");
-const softwareMarkdown = ref(props.item?.software_considerations ?? "");
-const exampleCodeMarkdown = ref(props.item?.example_code ?? "");
-
-// //computed property to convert markdown to html
-// const markdownToHtml = computed(() => {
-//     return marked(descriptionMarkdown.value);
-// });
-
 const form = useForm({
     title: props.item?.title ?? '',
-    description: descriptionMarkdown?.value ?? '',
-    wiring_instructions: wiringMarkdown?.value ?? '',
-    pros: prosMarkdown?.value ?? '',
-    cons: consMarkdown?.value ?? '',
-    hardware_considerations: hardwareMarkdown?.value ?? '',
-    software_considerations: softwareMarkdown?.value ?? '',
-    example_code: exampleCodeMarkdown?.value ?? '',
+    description: props.item?.description ?? '',
+    card_description: props.item?.card_description ?? '',
+    wiring_instructions:  props.item?.wiring_instructions ?? '',
+    pros: props.item?.pros ?? '',
+    cons:   props.item?.cons ?? '',
+    hardware_considerations: props.item?.hardware_considerations ?? '',
+    software_considerations: props.item?.software_considerations ?? '',
+    example_code: props.item?.example_code ?? '',
     edges: props.item?.json_items ?? [],
     photo: '',
     wiring_photo: '',
-    attributes: []
 });
 
 function handlePhotoChange(e: any) {
@@ -118,7 +105,6 @@ const submit = () => {
                     <Head title="Update item"/>
                     <div>
                         <InputLabel for="title" value="Title"/>
-
                         <TextInput
                             id="title"
                             type="text"
@@ -127,7 +113,6 @@ const submit = () => {
                             required
                             autofocus
                         />
-
                         <InputError class="mt-2" :message="form.errors.title"/>
                     </div>
 
@@ -145,10 +130,25 @@ const submit = () => {
                     <div class="w-96 mt-4">
                         <MarkDownTextArea
                             id="description"
-                            @updateMarkdown="descriptionMarkdown = $event; form.description = $event"
-                            :markdown="descriptionMarkdown"
+                            @updateMarkdown="form.description = $event"
                             :description="form.description"
                             :error="form.errors.description??''"/>
+                    </div>
+
+                    <div class="w-96 mt-4">
+                        <MarkDownTextArea
+                            id="card_description"
+                            @updateMarkdown="form.card_description = $event"
+                            :description="form.card_description"
+                            :error="form.errors.card_description??''"/>
+                    </div>
+
+                    <div class="w-96 mt-4">
+                        <MarkDownTextArea
+                            id="wiring_instructions"
+                            @updateMarkdown="form.wiring_instructions = $event"
+                            :description="form.wiring_instructions"
+                            :error="form.errors.wiring_instructions??''"/>
                     </div>
 
                     <div class="mt-4">
@@ -164,18 +164,8 @@ const submit = () => {
 
                     <div class="w-96 mt-4">
                         <MarkDownTextArea
-                            id="wiring_instructions"
-                            @updateMarkdown="wiringMarkdown = $event; form.wiring_instructions = $event"
-                            :markdown="wiringMarkdown"
-                            :description="form.wiring_instructions"
-                            :error="form.errors.wiring_instructions??''"/>
-                    </div>
-
-                    <div class="w-96 mt-4">
-                        <MarkDownTextArea
                             id="pros"
-                            @updateMarkdown="prosMarkdown = $event; form.pros = $event"
-                            :markdown="prosMarkdown"
+                            @updateMarkdown="form.pros = $event"
                             :description="form.pros"
                             :error="form.errors.pros??''"/>
                     </div>
@@ -183,8 +173,7 @@ const submit = () => {
                     <div class="w-96 mt-4">
                         <MarkDownTextArea
                             id="cons"
-                            @updateMarkdown="consMarkdown = $event; form.cons = $event"
-                            :markdown="consMarkdown"
+                            @updateMarkdown="form.cons = $event"
                             :description="form.cons"
                             :error="form.errors.cons??''"/>
                     </div>
@@ -192,8 +181,7 @@ const submit = () => {
                     <div class="w-96 mt-4">
                         <MarkDownTextArea
                             id="hardware_considerations"
-                            @updateMarkdown="hardwareMarkdown = $event; form.hardware_considerations = $event"
-                            :markdown="hardwareMarkdown"
+                            @updateMarkdown="form.hardware_considerations = $event"
                             :description="form.hardware_considerations"
                             :error="form.errors.hardware_considerations??''"/>
                     </div>
@@ -201,8 +189,7 @@ const submit = () => {
                     <div class="w-96 mt-4">
                         <MarkDownTextArea
                             id="software_considerations"
-                            @updateMarkdown="softwareMarkdown = $event; form.software_considerations = $event"
-                            :markdown="softwareMarkdown"
+                            @updateMarkdown="form.software_considerations = $event"
                             :description="form.software_considerations"
                             :error="form.errors.software_considerations??''"/>
                     </div>
@@ -210,8 +197,7 @@ const submit = () => {
                     <div class="w-96 mt-4">
                         <MarkDownTextArea
                             id="example_code"
-                            @updateMarkdown="exampleCodeMarkdown = $event; form.example_code = $event"
-                            :markdown="exampleCodeMarkdown"
+                            @updateMarkdown="form.example_code = $event"
                             :description="form.example_code"
                             :error="form.errors.example_code??''"/>
                     </div>

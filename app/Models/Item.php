@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * @property string name
  * @property string description
+ * @property string card_description
  * @property string public_id
  * @property boolean is_actuator
  * @property string photo
@@ -38,6 +39,7 @@ class Item extends Model
     protected $fillable = [
         'title',
         'description',
+        'card_description',
         'pros',
         'cons',
         'hardware_considerations',

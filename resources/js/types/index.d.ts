@@ -9,6 +9,7 @@ export interface Item {
     id: number;
     title: string;
     description: string;
+    card_description: string;
     wiring_instructions: string;
     pros: string;
     cons: string;
