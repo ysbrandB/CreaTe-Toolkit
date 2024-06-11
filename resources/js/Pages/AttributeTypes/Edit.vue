@@ -10,6 +10,7 @@ import {computed, ref} from "vue";
 import axios from "axios";
 import MarkDownTextArea from "@/CustomComponents/MarkDownTextArea.vue";
 import {AttributeType} from "@/types";
+import DangerButton from "@/Components/DangerButton.vue";
 
 const props = defineProps<{
     attributeType?: AttributeType
@@ -85,8 +86,10 @@ const submit = () => {
                 <InputError class="mt-2" :message="form.errors.color"/>
             </div>
 
-
-            <div class="flex items-center justify-end mt-4">
+            <div class="flex items-center justify-between mt-4">
+                <DangerButton class="ms-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
+                    Delete item
+                </DangerButton>
                 <PrimaryButton class="ms-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
                     Update item
                 </PrimaryButton>

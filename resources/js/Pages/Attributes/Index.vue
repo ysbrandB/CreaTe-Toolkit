@@ -13,7 +13,14 @@ const props = defineProps<{
 <template>
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Attributes</h2>
+            <div class="flex flex-row justify-between">
+                <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Attributes</h2>
+                <div class="flex flex-row gap-2">
+                    <NavLink :href="route('attributes.create')">
+                        New Attribute
+                    </NavLink>
+                </div>
+            </div>
         </template>
         <div class="grid sm:grid-cols-1 md:grid-cols-4 lg:grid-cols-6 mt-4">
            <card class="w-full" v-for="attributeType in props.attributeTypes" :color="attributeType.color">

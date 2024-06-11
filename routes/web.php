@@ -8,36 +8,19 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::resource('items', ItemController::class)->except(['show']);
+Route::resource('items', ItemController::class)->except(['show', 'index'])->middleware('auth');
 //item route that takes the hashid and returns the item
+Route::get('/', [ItemController::class, 'index'])->name('items.index');
 Route::group(['prefix' => 'items'], function () {
     Route::get('/item/{public_id}', [ItemController::class, 'show'])->name('items.show');
 });
 
-Route::resource('attribute_types', AttributeTypeController::class);
+Route::resource('attribute_types', AttributeTypeController::class)->middleware('auth');
 Route::resource('attributes', AttributeController::class);
 
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
-
-Route::get('/configurator', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
-
-Route::get('/dashboard', function () {
+Route::get('/choice-helper', function () {
     return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

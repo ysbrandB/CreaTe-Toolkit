@@ -22,6 +22,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property string example_code
  * @property string wiring_photo
  * @property string wiring_instructions
+ * @property string photo_url
+ * @property string wiring_photo_url
+ * @property mixed json_items
  *
  */
 
@@ -39,13 +42,19 @@ class Item extends Model
         'cons',
         'hardware_considerations',
         'software_considerations',
+        'wiring_instructions',
         'example_code',
         'photo',
         'is_actuator',
+        'json_items'
     ];
 
     protected $with = ['attributes'];
     protected $appends = ['public_id', 'photo_url', 'wiring_photo_url'];
+
+    protected $casts = [
+        'json_items' => 'json',
+    ];
 
     public function attributes(): BelongsToMany
     {

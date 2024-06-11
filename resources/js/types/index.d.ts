@@ -19,6 +19,7 @@ export interface Item {
     photo_url?: string;
     wiring_photo_url?: string;
     attributes?: Attribute[];
+    json_items?: number[];
 }
 
 export interface Attribute {

@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('items', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->string('photo');
+            $table->string('photo')->nullable();
             $table->string('wiring_instructions');
-            $table->string('wiring_photo');
+            $table->string('wiring_photo')->nullable();
             $table->text('description');
             $table->text('pros');
             $table->text('cons');
@@ -24,6 +24,7 @@ return new class extends Migration
             $table->text('software_considerations');
             $table->text('example_code');
             $table->boolean('is_actuator')->default(false);
+            $table->json('json_items');
             $table->timestamps();
         });
     }

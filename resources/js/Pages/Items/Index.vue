@@ -26,15 +26,9 @@ const reloadWithFilters = (filters: object) => {
         <template #header>
             <div class="flex flex-row justify-between">
                 <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Items</h2>
-                <div class="flex flex-row gap-2">
+                <div class="flex flex-row gap-2" v-if="$page.props.auth.user">
                     <NavLink :href="route('items.create')">
                         New item
-                    </NavLink>
-                    <NavLink :href="route('attribute_types.create')">
-                        New Attribute Type
-                    </NavLink>
-                    <NavLink :href="route('attributes.create')">
-                        New Attribute
                     </NavLink>
                 </div>
             </div>

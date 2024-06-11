@@ -4,7 +4,6 @@ import {Head} from '@inertiajs/vue3';
 import Modal from "@/Components/Modal.vue";
 import {ref} from "vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
-const showModal = ref(true);
 </script>
 
 <template>
@@ -32,15 +31,8 @@ const showModal = ref(true);
                     <div class="ml-3 w-full p-8 bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                         <div class="p-6 text-gray-900 text-2xl dark:text-gray-100">Sensing</div>
                     </div>
-                    <secondary-button @click="showModal=true">hallo allemaal 1</secondary-button>
                 </div>
             </div>
         </div>
-
-        <Modal :show="showModal">
-            <div class="mt-6 flex justify-end">
-                <SecondaryButton @click="showModal=false"> hallo allemaal dit wordt gecancelled </SecondaryButton>
-            </div>
-        </Modal>
     </AuthenticatedLayout>
 </template>

@@ -29,6 +29,7 @@ class ItemFactory extends Factory
             'example_code' => $this->faker->paragraph,
             'wiring_photo' => 'Af2XzLDwCqixQw8LcnJm5mATRiBHkXIJCVVdnGYf.jpg',
             'wiring_instructions' => $this->faker->paragraph,
+            'json_items' => json_encode([1, 2, 3, 4, 5]),
         ];
     }
 }

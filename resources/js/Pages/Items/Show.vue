@@ -19,7 +19,7 @@ const props = defineProps<{
             id: number;
             title: string;
             color: string;
-            attribute_type:{
+            attribute_type: {
                 id: number;
                 title: string;
                 description: string;
@@ -34,6 +34,7 @@ import OpeningCard from "@/CustomComponents/OpeningCard.vue";
 import Pill from "@/CustomComponents/Pill.vue";
 import HighlightJSVuePlugin from '@highlightjs/vue-plugin';
 import 'highlight.js/lib/common';
+
 const VHighlightjs = HighlightJSVuePlugin.component;
 import 'highlight.js/styles/atom-one-dark.css';
 </script>
@@ -48,12 +49,14 @@ import 'highlight.js/styles/atom-one-dark.css';
                         {{ item.title }}</h2>
 
                 </div>
-                <NavLink class="px-6" :href="route('items.edit', item)">
-                    Edit item {{ item.id }}
-                </NavLink>
-                <NavLink class="px-6" :href="route('items.destroy', item)">
-                    Delete item {{ item.id }}
-                </NavLink>
+                <div v-if="$page.props.auth.user">
+                    <NavLink class="px-6" :href="route('items.edit', item)">
+                        Edit item {{ item.id }}
+                    </NavLink>
+                    <NavLink class="px-6" :href="route('items.destroy', item)">
+                        Delete item {{ item.id }}
+                    </NavLink>
+                </div>
             </div>
         </template>
         <section class="w-full h-full mx-auto">
@@ -96,7 +99,7 @@ import 'highlight.js/styles/atom-one-dark.css';
 
                     <OpeningCard title="Example code">
                         <template #content>
-                            <v-highlightjs autodetect :code="item.example_code" />
+                            <v-highlightjs autodetect :code="item.example_code"/>
                         </template>
                     </OpeningCard>
                 </div>
@@ -107,11 +110,13 @@ import 'highlight.js/styles/atom-one-dark.css';
                             <div class="dark:text-gray-100 font-bold text-2xl mb-2">{{ item.title }}</div>
                             <img :src="item.photo_url" class="rounded-lg w-[75%] mx-auto" alt="item photo">
                             <div class="text-gray-600 text-sm my-2">{{ item.description }}</div>
-                            <qrcode-vue class="float-right max-w-[80px] max-h-[80px] dark:bg-gray-800 dark:text-gray-100"
-                                        :value="route('items.show', props.item.public_id)" level="M"
-                                        render-as="svg"/>
+                            <qrcode-vue
+                                class="float-right max-w-[80px] max-h-[80px] dark:bg-gray-800 dark:text-gray-100"
+                                :value="route('items.show', props.item.public_id)" level="M"
+                                render-as="svg"/>
                             <div class="flex flex-wrap">
-                                <pill v-for="attribute in item.attributes" :key="attribute.id" :color="attribute.attribute_type.color">
+                                <pill v-for="attribute in item.attributes" :key="attribute.id"
+                                      :color="attribute.attribute_type.color">
                                     {{ attribute.title }}
                                 </pill>
                             </div>

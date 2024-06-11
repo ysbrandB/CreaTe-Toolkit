@@ -19,7 +19,7 @@ const props = defineProps<{
     myAttributes: any
 }>();
 
-const initialSelectedAttributes = {} as Record<string, { color:string, attributes: Attribute[]|undefined }>;
+const initialSelectedAttributes = {} as Record<string, { color: string, attributes: Attribute[] | undefined }>;
 props.myAttributes?.forEach((attributeType: AttributeType) => {
     initialSelectedAttributes[attributeType.id.toString()] = {
         color: attributeType.color,
@@ -27,24 +27,24 @@ props.myAttributes?.forEach((attributeType: AttributeType) => {
     };
 });
 
-const selectedAttributes = ref<Record<string, { color:string, attributes: Attribute[]|undefined }>>(initialSelectedAttributes);
-
+const selectedAttributes = ref<Record<string, {
+    color: string,
+    attributes: Attribute[] | undefined
+}>>(initialSelectedAttributes);
 
 const flattenedSelectedAttributes = computed(() => {
     let flattened: number[] = [];
-    Object.values(selectedAttributes.value).forEach((attributeType: { attributes: Attribute[]|undefined }) => {
-        if(attributeType.attributes === undefined) return;
+    Object.values(selectedAttributes.value).forEach((attributeType: { attributes: Attribute[] | undefined }) => {
+        if (attributeType.attributes === undefined) return;
         attributeType.attributes.forEach((attribute: Attribute) => {
             flattened.push(attribute.id);
         });
     });
     return flattened;
 });
-
-const selectedItems = ref<string[]>([])
 const addSelectedItem = (item: number, idx: number) => {
     // @ts-ignore
-    selectedItems.value[idx] = item;
+    form.edges[idx] = item;
 }
 
 const descriptionMarkdown = ref(props.item?.description ?? "");
@@ -69,24 +69,26 @@ const form = useForm({
     hardware_considerations: hardwareMarkdown?.value ?? '',
     software_considerations: softwareMarkdown?.value ?? '',
     example_code: exampleCodeMarkdown?.value ?? '',
+    edges: props.item?.json_items ?? [],
+    photo: '',
+    wiring_photo: '',
+    attributes: []
 });
 
-const submit = () => {
+function handlePhotoChange(e: any) {
+    form.photo = e.target.files[0]
+}
 
+function handleWiringPhotoChange(e: any) {
+    form.wiring_photo = e.target.files[0]
+}
+
+const submit = () => {
     const formData = new FormData();
     Object.keys(form.data()).forEach(key => {
         // @ts-ignore
         formData.append(key, form.data()[key]);
     });
-    // @ts-ignore
-    formData.append('photo', thumbnail.value.data);
-    // @ts-ignore
-    formData.append('wiring_photo', wiringPhoto.value.data);
-    // @ts-ignore
-    formData.append('edges', selectedItems.value ?? []);
-    // @ts-ignore
-    formData.append('attributes', flattenedSelectedAttributes.value ?? [])
-    //weird put method hack to actually let laravel know this is a put request
     if (props.item) formData.append('_method', 'put');
     console.log(...formData.entries());
     let postRoute = props.item ? route('items.update', props.item.id) : route('items.store');
@@ -94,36 +96,18 @@ const submit = () => {
         headers: {
             'Content-Type': 'multipart/form-data'
         }
-    }).then(() => {
-            return router.get(route('items.index'));
+    }).then((data) => {
+            if (data.status === 200) {
+                if(props.item)
+                    return router.get(route('items.show', props.item?.public_id));
+                return router.get(route('items.index'));
+            }
+            console.error(data?.data?.response.data);
         }
-    );
+    ).catch((error) => {
+        console.log(error);
+    });
 };
-
-const thumbnail = ref({
-    name: '',
-    data: null,
-});
-
-const wiringPhoto = ref({
-    name: '',
-    data: null,
-});
-const updatePhoto = (files: any) => {
-    if (!files.length) return;
-
-    // Store the file data
-    thumbnail.value.data = files[0];
-    thumbnail.value.name = files[0].name;
-}
-
-const updateWiringPhoto = (files: any) => {
-    if (!files.length) return;
-
-    // Store the file data
-    wiringPhoto.value.data = files[0];
-    wiringPhoto.value.name = files[0].name;
-}
 </script>
 
 <template>
@@ -154,9 +138,7 @@ const updateWiringPhoto = (files: any) => {
 
                         <input type="file" accept="image/*" class="form-control-file"
                                name="photo"
-                               @change="updatePhoto(
-                           //@ts-ignore
-                           $event.target.files)"
+                               @change="handlePhotoChange"
                         >
                     </div>
 
@@ -176,10 +158,7 @@ const updateWiringPhoto = (files: any) => {
 
                         <input type="file" accept="image/*" class="form-control-file"
                                name="wiring_photo"
-                               @change="updateWiringPhoto(
-                           //@ts-ignore
-                           $event.target.files
-)"
+                               @change="handleWiringPhotoChange"
                         >
                     </div>
 
@@ -243,13 +222,15 @@ const updateWiringPhoto = (files: any) => {
                             title="attributes"
                             :attribute-types="props.attributeTypes"
                             :checked-attributes="initialSelectedAttributes"
-                            @update:checked-attributes="selectedAttributes=$event;"/>
+                            @update:checked-attributes="
+                            // @ts-ignore
+                            selectedAttributes=$event; form.attributes = flattenedSelectedAttributes"/>
                     </div>
                 </card>
                 <card>
                     <div class="w-96 mt-4 text-center">
                         <div class="text-md">This item</div>
-                        <div v-for="(selectedItemId, index) in selectedItems" :key="index">
+                        <div v-for="(selectedItemId, index) in form.edges" :key="index">
                             <div class="text-lg font-bold">↓</div>
                             <select
                                 :id="index.toString()"
@@ -261,7 +242,7 @@ const updateWiringPhoto = (files: any) => {
                                 <option v-for="selectableItem in props.items"
                                         :value="selectableItem.id"
                                         :key="selectableItem.id"
-                                        :selected="selectedItemId === selectableItem.id.toString()">
+                                        :selected="selectedItemId === selectableItem.id">
                                     {{ selectableItem.title }}
                                 </option>
                             </select>
@@ -271,7 +252,7 @@ const updateWiringPhoto = (files: any) => {
                             class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                             @change="addSelectedItem(
                                 // @ts-ignore
-                                $event.target.value, selectedItems?.length??0); $event.target.value = '';"
+                                $event.target.value, form.edges?.length??0); $event.target.value = '';"
                         >
                             <option value="" selected disabled hidden>Choose another block</option>
                             <option v-for="selectableItem in props.items"

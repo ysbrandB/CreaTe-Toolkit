@@ -49,19 +49,23 @@ class ItemController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreItemRequest $request)
+    public function store(Request $request)
     {
         $photo = $request->file('photo');
         $photo?->storeAs('photos/' . $photo->hashName(), ['disk' => 'public']);
         $wiringPhoto = $request->file('wiring_photo');
         $wiringPhoto?->storeAs('photos/' . $photo->hashName(), ['disk' => 'public']);
-
-        $item = Item::create($request->except('attributes', 'photo', 'wiring_photo'));
-        $item->attributes()->sync(explode(',', $request->input('attributes')));
+        $item = new Item();
+        $item->fill($request->except('attributes', 'photo', 'wiring_photo', 'json_items'));
+        $item->json_items = array_map('intval',  explode(',', $request->input('edges')));
         $item->photo = $photo?->hashName();
         $item->wiring_photo = $wiringPhoto?->hashName();
         $item->save();
-        return redirect(route('items.index'));
+        $string = explode(',', $request->input('attributes'));
+        if($string && $string[0]!==''){
+            $item->attributes()->sync($string);
+        }
+        return to_route('items.show', ['public_id' => $item->public_id]);
     }
 
     /**
@@ -69,8 +73,11 @@ class ItemController extends Controller
      */
     public function show(string $publicId)
     {
-        $id = Hashids::decode($publicId)[0];
-        $item = Item::with('attributes', 'attributes.attributeType')->findOrFail($id);
+        $id = Hashids::decode($publicId);
+        if(!$id || !isset($id[0])) {
+            abort(404);
+        }
+        $item = Item::with('attributes', 'attributes.attributeType')->findOrFail($id[0]);
         return Inertia::render('Items/Show', [
             'item' => $item,
         ]);
@@ -100,14 +107,12 @@ class ItemController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(StoreItemRequest $request, int $id)
+    public function update(Request $request, int $id)
     {
         $item = Item::findOrFail($id);
-
         $photo = $request->file('photo');
         if($photo){
             $photo->storeAs('photos/' . $photo->hashName(), ['disk' => 'public']);
-
             if ($item->photo) {
                 //delete the old photo
                 Storage::disk('public')->delete('photos/' . $item->photo);
@@ -126,10 +131,14 @@ class ItemController extends Controller
             $item->wiring_photo = $wiring_photo->hashName();
         }
 
-        $item->update($request->except('attributes', 'photo', 'wiring_photo'));
-        $item->attributes()->sync(explode(',', $request->input('attributes')));
+        $item->fill($request->except('attributes', 'photo', 'wiring_photo', 'json_items'));
+        $item->json_items = array_map('intval',  explode(',', $request->input('edges')));
         $item->save();
-        return redirect()->back();
+        $string = explode(',', $request->input('attributes'));
+        if($string && $string[0]!==''){
+            $item->attributes()->sync($string);
+        }
+        return to_route('items.show', ['public_id' => $item->public_id]);
     }
 
     /**

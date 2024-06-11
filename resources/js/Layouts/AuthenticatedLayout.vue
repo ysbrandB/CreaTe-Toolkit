@@ -5,15 +5,19 @@ import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
-import { Link } from '@inertiajs/vue3';
+import {Link, usePage} from '@inertiajs/vue3';
 
 const showingNavigationDropdown = ref(false);
+
 const links = [
     { href: route('dashboard'), active: route().current('dashboard'), text: 'Dashboard' },
     { href: route('items.index'), active: route().current('items.index'), text: 'Items' },
-    { href: route('attribute_types.index'), active: route().current('attribute_types.index'), text: 'Attribute Types' },
-    { href: route('attributes.index'), active: route().current('attributes.index'), text: 'Attributes' },
 ];
+if(usePage().props.auth.user!==null){
+   links.push(
+       { href: route('attribute_types.index'), active: route().current('attribute_types.index'), text: 'Attribute Types' },
+       { href: route('attributes.index'), active: route().current('attributes.index'), text: 'Attributes' })
+}
 </script>
 
 <template>
@@ -44,7 +48,7 @@ const links = [
 
                         <div class="hidden sm:flex sm:items-center sm:ms-6">
                             <!-- Settings Dropdown -->
-                            <div class="ms-3 relative">
+                            <div class="ms-3 relative" v-if="$page.props.auth.user">
                                 <Dropdown align="right" width="48">
                                     <template #trigger>
                                         <span class="inline-flex rounded-md">
@@ -70,13 +74,28 @@ const links = [
                                         </span>
                                     </template>
 
-                                    <template>
+                                    <template #content>
                                         <DropdownLink :href="route('profile.edit')"> Profile </DropdownLink>
                                         <DropdownLink :href="route('logout')" method="post" as="button">
                                             Log Out
                                         </DropdownLink>
                                     </template>
                                 </Dropdown>
+                            </div>
+                            <div class="ms-3 relative" v-else>
+                                <Link
+                                    :href="route('login')"
+                                    class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
+                                >
+                                    Log in
+                                </Link>
+
+                                <Link
+                                    :href="route('register')"
+                                    class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
+                                >
+                                    Register
+                                </Link>
                             </div>
                         </div>
 
@@ -125,7 +144,7 @@ const links = [
                     </div>
 
                     <!-- Responsive Settings Options -->
-                    <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600">
+                    <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600" v-if="$page.props.auth.user">
                         <div class="px-4">
                             <div class="font-medium text-base text-gray-800 dark:text-gray-200">
                                 {{ $page.props.auth.user.name }}
