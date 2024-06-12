@@ -30,7 +30,7 @@ class ItemController extends Controller
 
         return Inertia::render('Items/Index', [
             'items' => $items->get(),
-            'attributeTypes' => AttributeType::with('attributes')->get(),
+            'attributeTypes' => AttributeType::with('attributes')->orderBy('created_at', 'desc')->get(),
             'filters' => $filters,
         ]);
     }

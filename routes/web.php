@@ -4,6 +4,7 @@ use App\Http\Controllers\AttributeController;
 use App\Http\Controllers\AttributeTypeController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ProfileController;
+use App\Models\Item;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -17,7 +18,11 @@ Route::group(['prefix' => 'items'], function () {
 
 Route::resource('attribute_types', AttributeTypeController::class)->middleware('auth');
 Route::resource('attributes', AttributeController::class);
-
+Route::get('/test', function () {
+    return Inertia::render('Test', [
+        'json_items'=>Item::query()->select('json_items', 'id')->without('attributes')->get()
+    ]);
+})->name('test');
 Route::get('/choice-helper', function () {
     return Inertia::render('Dashboard');
 })->name('dashboard');

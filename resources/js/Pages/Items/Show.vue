@@ -32,7 +32,6 @@ const renderMarkdown = (markdown: string) => marked(markdown);
                 <div>
                     <h2 class="font-semibold text-2xl font-bold text-gray-800 dark:text-gray-200 leading-tight">
                         {{ item.title }}</h2>
-                <div class="text-gray-600 text-sm mt-4">{{ item.description }}</div>
                 </div>
                 <div v-if="$page.props.auth.user">
                     <NavLink class="px-6" :href="route('items.edit', item.id)">
@@ -47,14 +46,9 @@ const renderMarkdown = (markdown: string) => marked(markdown);
         <section class="w-full h-full mx-auto">
             <div class="grid grid-cols-3 md:grid-cols-12">
                 <div class="col-span-3 md:col-span-9 mt-4">
-
-                    <OpeningCard title="Wiring">
+                    <OpeningCard title="Description" :open="true">
                         <template #content>
-                            <div class="float-right mb-2 text-black italic dark:text-gray-100">
-                                <img :src="item.wiring_photo_url" width="400" class="rounded-lg" alt="wiring diagram">
-                                Wiring diagram
-                            </div>
-                            <div v-html="renderMarkdown(item.wiring_instructions)"></div>
+                            <div v-html="renderMarkdown(item.description)"></div>
                         </template>
                     </OpeningCard>
 
@@ -79,6 +73,16 @@ const renderMarkdown = (markdown: string) => marked(markdown);
                     <OpeningCard title="Software considerations">
                         <template #content>
                             <div v-html="renderMarkdown(item.software_considerations)"></div>
+                        </template>
+                    </OpeningCard>
+
+                    <OpeningCard title="Wiring">
+                        <template #content>
+                            <div class="float-right mb-2 text-black italic dark:text-gray-100">
+                                <img :src="item.wiring_photo_url" width="400" class="rounded-lg" alt="wiring diagram">
+                                Wiring diagram
+                            </div>
+                            <div v-html="renderMarkdown(item.wiring_instructions)"></div>
                         </template>
                     </OpeningCard>
 
@@ -116,3 +120,9 @@ const renderMarkdown = (markdown: string) => marked(markdown);
         </section>
     </AuthenticatedLayout>
 </template>
+
+<style scoped>
+code {
+    border-radius: 20px;
+}
+</style>
