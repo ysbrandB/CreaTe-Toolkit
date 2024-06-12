@@ -39,7 +39,6 @@ if(props.python) {
     nodes[`node${props.python.id}`] = {name: props.python.title, photo_url: props.python.photo_url, public_id: props.python.public_id}
 }
 props.items.forEach((item: Item) => {
-    console.log(item.photo_url)
     //@ts-ignore
     nodes[`node${item.id}`] = {name: item.title, photo_url: item.photo_url, public_id: props.python.public_id}
     //@ts-ignore
@@ -55,6 +54,15 @@ Array.from(myEdges).forEach((edge: Edge, index: number) => {
         edges[`edge${index}`] = edge
     }
 })
+
+const eventHandlers: vNG.EventHandlers = {
+    "node:click": ({ node }) => {
+        // toggle
+        router.get(route('items.show',
+        // @ts-ignore
+        {public_id: nodes[node].public_id}))
+    },
+}
 
 const configs = reactive(
     vNG.defineConfigs({
@@ -108,6 +116,7 @@ const configs = reactive(
                 :nodes="nodes"
                 :edges="edges"
                 :configs="configs"
+                :event-handlers="eventHandlers"
             >
                 <defs>
                     <!--
@@ -143,9 +152,6 @@ const configs = reactive(
                     />
                     <!-- circle for drawing stroke -->
                     <circle
-                        @click="router.get(route('items.show',
-                        // @ts-ignore
-                        {public_id: nodes[nodeId].public_id}))"
                         class="face-circle"
                         :r="config.radius * scale"
                         fill="none"
