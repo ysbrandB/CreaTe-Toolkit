@@ -20,9 +20,11 @@ Route::resource('attribute_types', AttributeTypeController::class)->middleware('
 Route::resource('attributes', AttributeController::class);
 Route::get('/test', function () {
     return Inertia::render('Test', [
-        'json_items'=>Item::query()->select('json_items', 'id')->without('attributes')->get()
+        'items'=>Item::query()->whereNot('id', env('PYTHON_ID'))->select('json_items', 'id', 'title', 'photo')->without('attributes')->get(),
+        'python'=>Item::query()->where('id', env('PYTHON_ID'))->select('json_items', 'id', 'title', 'photo')->without('attributes')->firstOrFail()
     ]);
 })->name('test');
+
 Route::get('/choice-helper', function () {
     return Inertia::render('Dashboard');
 })->name('dashboard');

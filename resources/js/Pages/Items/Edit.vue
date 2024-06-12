@@ -58,6 +58,7 @@ const form = useForm({
     software_considerations: props.item?.software_considerations ?? '',
     example_code: props.item?.example_code ?? '',
     edges: props.item?.json_items ?? [],
+    attributes: flattenedSelectedAttributes.value,
     photo: '',
     wiring_photo: '',
 });
@@ -89,7 +90,7 @@ const submit = () => {
                     return router.get(route('items.show', props.item.public_id));
                 return router.get(route('items.index'));
             }
-            console.error(data?.data?.response.data);
+            console.log(data);
         }
     ).catch((error) => {
         console.log(error);

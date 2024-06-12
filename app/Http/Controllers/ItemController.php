@@ -57,14 +57,12 @@ class ItemController extends Controller
         $wiringPhoto?->storeAs('photos/' . $photo->hashName(), ['disk' => 'public']);
         $item = new Item();
         $item->fill($request->except('attributes', 'photo', 'wiring_photo', 'json_items'));
-        $item->json_items = array_map('intval',  explode(',', $request->input('edges')));
+        $item->json_items = array_map('intval', explode(',', $request->input('edges')));
         $item->photo = $photo?->hashName();
         $item->wiring_photo = $wiringPhoto?->hashName();
         $item->save();
         $string = explode(',', $request->input('attributes'));
-        if($string && $string[0]!==''){
-            $item->attributes()->sync($string);
-        }
+        $item->attributes()->sync($string[0] === "" ? [] : $string);
         return to_route('items.show', ['public_id' => $item->public_id]);
     }
 
@@ -74,7 +72,7 @@ class ItemController extends Controller
     public function show(string $publicId)
     {
         $id = Hashids::decode($publicId);
-        if(!$id || !isset($id[0])) {
+        if (!$id || !isset($id[0])) {
             abort(404);
         }
         $item = Item::with('attributes', 'attributes.attributeType')->findOrFail($id[0]);
@@ -111,7 +109,7 @@ class ItemController extends Controller
     {
         $item = Item::findOrFail($id);
         $photo = $request->file('photo');
-        if($photo){
+        if ($photo) {
             $photo->storeAs('photos/' . $photo->hashName(), ['disk' => 'public']);
             if ($item->photo) {
                 //delete the old photo
@@ -121,7 +119,7 @@ class ItemController extends Controller
         }
 
         $wiring_photo = $request->file('wiring_photo');
-        if($wiring_photo){
+        if ($wiring_photo) {
             $wiring_photo->storeAs('photos/' . $wiring_photo->hashName(), ['disk' => 'public']);
 
             if ($item->wiring_photo) {
@@ -132,12 +130,10 @@ class ItemController extends Controller
         }
 
         $item->fill($request->except('attributes', 'photo', 'wiring_photo', 'json_items'));
-        $item->json_items = array_map('intval',  explode(',', $request->input('edges')));
+        $item->json_items = array_map('intval', explode(',', $request->input('edges')));
         $item->save();
         $string = explode(',', $request->input('attributes'));
-        if($string && $string[0]!==''){
-            $item->attributes()->sync($string);
-        }
+        $item->attributes()->sync($string[0] === "" ? [] : $string);
         return to_route('items.show', ['public_id' => $item->public_id]);
     }
 

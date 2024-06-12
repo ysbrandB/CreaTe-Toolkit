@@ -60,20 +60,23 @@ class DatabaseSeeder extends Seeder
             Attribute::factory()->count(5)
         )->create();
 
+
+        Item::factory()->create([
+            'title'=>'Python',
+        ]);
+
         $items = Item::factory(10)->create();
+        for($i = 2; $i < 11-3; $i+=3) {
+            $item = $items[$i];
+            $item->json_items = [$i, $i + 1, $i + 2];
+            $item->save();
+        }
+
         $attributes = Attribute::all();
         foreach ($items as $item) {
             $item->attributes()->attach(
                 $attributes->random(3)
             );
-        }
-
-        for($i = 0; $i < sizeof($items) - 1; $i++) {
-            Edge::create([
-                'from_item_id' => $items->get($i)->id,
-                'to_item_id' => $items->get($i+1)->id,
-                'belongsto_item_id' => $items->first()->id,
-            ]);
         }
     }
 }
