@@ -4,9 +4,13 @@ import {Head, router} from '@inertiajs/vue3';
 
 const props = defineProps<{
     items: Item[],
-    python: Item
+    nodes: Item[]
+    python: Item,
+    log?: any
 }>();
-import {VNetworkGraph} from "v-network-graph"
+if(props.log)
+    console.log(props.log);
+import {Configs, Edges, VNetworkGraph} from "v-network-graph"
 import "v-network-graph/lib/style.css"
 import 'd3-force';
 import {reactive} from "vue"
@@ -38,15 +42,26 @@ if(props.python) {
     //@ts-ignore
     nodes[`node${props.python.id}`] = {name: props.python.title, photo_url: props.python.photo_url, public_id: props.python.public_id}
 }
+
+const addNode = (item: Item) =>{
+    const node: Node = {name: item.title, photo_url: item.photo_url, public_id: item.public_id};
+    //@ts-ignore
+    nodes[`node${item.id}`] = node;
+}
+
 props.items.forEach((item: Item) => {
-    //@ts-ignore
-    nodes[`node${item.id}`] = {name: item.title, photo_url: item.photo_url, public_id: props.python.public_id}
-    //@ts-ignore
-    const list = [item.id, ...item.json_items, props.python.id]
+    addNode(item)
+    const list = [item.id, ...item.json_items??[], props.python.id]
     for(let i=0; i<list.length - 1; i++){
+        //@ts-ignore
         myEdges.add({source: `node${list[i]}`, target: `node${list[i+1]}`})
     }
 })
+
+props.nodes.forEach((item: Item) => {
+    addNode(item)
+})
+
 //filter out the myEdges where source is target and target is source from another item
 Array.from(myEdges).forEach((edge: Edge, index: number) => {
     if(!myEdges.has({source: edge.target, target: edge.source})){
@@ -98,6 +113,24 @@ const configs = reactive(
                 direction: "south",
                 text: "name",
             },
+        },
+        edge: {
+            summarize: ((edges: Edges, configs: Configs) => true),
+            summarized: { // configs for summarized edge
+                label: {
+                    // * These fields can also be specified with the function as
+                    //   `(edges: Record<string, Edge>) => value`.
+                    fontSize: 0, // font size.  default: 10
+                    color:  "#4466cc"      // font color. default: "#4466cc"
+                },
+                shape:{
+                  width: 0,
+                  height: 0,
+                },
+                stroke:{
+                  width: 2,
+                }
+            }
         },
     })
 )

@@ -23,7 +23,6 @@ const emit = defineEmits<{
 <template>
     <div class="relative w-full min-w-[200px] mt-6">
                     <textarea
-                        required
                         :value="description"
                         @input="$emit('updateMarkdown', (
                                //@ts-ignore

@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreItemRequest;
-use App\Models\Attribute;
 use App\Models\AttributeType;
 use App\Models\Item;
 use Illuminate\Http\Request;
@@ -57,7 +55,10 @@ class ItemController extends Controller
         $wiringPhoto?->storeAs('photos/' . $photo->hashName(), ['disk' => 'public']);
         $item = new Item();
         $item->fill($request->except('attributes', 'photo', 'wiring_photo', 'json_items'));
-        $item->json_items = array_map('intval', explode(',', $request->input('edges')));
+        $json_items = explode(',', $request->input('edges'));
+        if ($json_items[0] !== "") {
+            $item->json_items = array_map('intval',$json_items);
+        }
         $item->photo = $photo?->hashName();
         $item->wiring_photo = $wiringPhoto?->hashName();
         $item->save();
@@ -130,7 +131,10 @@ class ItemController extends Controller
         }
 
         $item->fill($request->except('attributes', 'photo', 'wiring_photo', 'json_items'));
-        $item->json_items = array_map('intval', explode(',', $request->input('edges')));
+        $json_items = explode(',', $request->input('edges'));
+        if ($json_items[0] !== "") {
+            $item->json_items = array_map('intval',$json_items);
+        }
         $item->save();
         $string = explode(',', $request->input('attributes'));
         $item->attributes()->sync($string[0] === "" ? [] : $string);

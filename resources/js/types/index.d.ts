@@ -8,14 +8,14 @@ export interface User {
 export interface Item {
     id: number;
     title: string;
-    description: string;
-    card_description: string;
-    wiring_instructions: string;
-    pros: string;
-    cons: string;
-    hardware_considerations: string;
-    software_considerations: string;
-    example_code: string;
+    description?: string;
+    card_description?: string;
+    wiring_instructions?: string;
+    pros?: string;
+    cons?: string;
+    hardware_considerations?: string;
+    software_considerations?: string;
+    example_code?: string;
     public_id: string;
     photo_url?: string;
     wiring_photo_url?: string;

@@ -20,7 +20,7 @@ import 'highlight.js/styles/atom-one-dark.css';
 
 import {marked} from 'marked';
 
-const renderMarkdown = (markdown: string) => marked(markdown);
+const renderMarkdown = (markdown: string|undefined) => marked(markdown??'');
 
 </script>
 
@@ -47,36 +47,36 @@ const renderMarkdown = (markdown: string) => marked(markdown);
             <div class="grid grid-cols-3 md:grid-cols-12">
                 <div class="col-span-3 md:col-span-9 mt-4">
                     <OpeningCard title="Description" :open="true">
-                        <template #content>
+                        <template #content v-if="item.description">
                             <div v-html="renderMarkdown(item.description)"></div>
                         </template>
                     </OpeningCard>
 
-                    <OpeningCard title="Pros">
+                    <OpeningCard title="Pros" v-if="item.pros">
                         <template #content>
                             <div v-html="renderMarkdown(item.pros)"></div>
                         </template>
                     </OpeningCard>
 
-                    <OpeningCard title="Cons">
+                    <OpeningCard title="Cons" v-if="item.cons">
                         <template #content>
                             <div v-html="renderMarkdown(item.cons)"></div>
                         </template>
                     </OpeningCard>
 
-                    <OpeningCard title="Hardware considerations">
+                    <OpeningCard title="Hardware considerations" v-if="item.hardware_considerations">
                         <template #content>
                             <div v-html="renderMarkdown(item.hardware_considerations)"></div>
                         </template>
                     </OpeningCard>
 
-                    <OpeningCard title="Software considerations">
+                    <OpeningCard title="Software considerations" v-if="item.software_considerations">
                         <template #content>
                             <div v-html="renderMarkdown(item.software_considerations)"></div>
                         </template>
                     </OpeningCard>
 
-                    <OpeningCard title="Wiring">
+                    <OpeningCard title="Wiring" v-if="item.wiring_instructions">
                         <template #content>
                             <div class="float-right mb-2 text-black italic dark:text-gray-100">
                                 <img :src="item.wiring_photo_url" width="400" class="rounded-lg" alt="wiring diagram">
@@ -86,30 +86,31 @@ const renderMarkdown = (markdown: string) => marked(markdown);
                         </template>
                     </OpeningCard>
 
-                    <OpeningCard title="Example code">
+                    <OpeningCard title="Example code" v-if="item.example_code">
                         <template #content>
-                            <v-highlightjs autodetect :code="item.example_code" class="w-full sm:text-sm"/>
+                            <v-highlightjs autodetect :code="item.example_code??''" class="w-full sm:text-sm"/>
                         </template>
                     </OpeningCard>
                 </div>
                 <div class="col-span-3 md:pt-0 mt-4">
-                    <div class="sticky top-8 max-w-7xl mx-auto sm:pr-6 lg:pr-4" id="wrapper">
-                        <div
-                            id="resizeCard"
-                            class="p-8 bg-white dark:bg-gray-800 shadow-sm rounded-lg aspect-[63/88] overflow-hidden">
-                            <div class="dark:text-gray-100 font-bold text-2xl mb-2">{{ item.title }}</div>
-                            <img :src="item.photo_url" class="rounded-lg w-[75%] mx-auto" alt="item photo">
-                            <div class="text-gray-600 text-sm my-2">{{ item.card_description }}</div>
+                    <div class="sticky top-8 sm:px-6 lg:px-4 relative flex-col flex items-center justify-items-center" id="wrapper" style="font-size: 80%">
+                        <div id="resizeCard" style="padding: 2em; width:23em; background-color: white; color: #1a202c; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); border-radius: 0.5em; aspect-ratio: 63/88; overflow: hidden;">
+                            <div style="font-weight: bold; font-size: 2em; margin-bottom: 0.3em;">
+                                {{ item.title }}
+                            </div>
+                            <img :src="item.photo_url" style="border-radius: 0.5em; max-width: 15em; display: block; margin: 0 auto;" alt="item photo">
+                            <div style="color: #718096; font-size: 0.875em; margin: 1em 0;">
+                                {{ item.card_description }}
+                            </div>
                             <qrcode-vue
-                                class="float-right max-w-[80px] max-h-[80px] dark:bg-gray-800 dark:text-gray-100 m-2"
+                                style="float: right; max-width: 5em; max-height: 5em; background-color: #1a202c; color: #f7fafc; margin: 0.5em;"
                                 :value="route('items.show', props.item.public_id)"
                                 :margin="2"
                                 :size="500"
                                 level="Q"
                                 render-as="canvas"/>
-                            <div class="flex flex-wrap">
-                                <pill v-for="attribute in item.attributes" :key="attribute.id"
-                                      :color="attribute.attribute_type?.color??''">
+                            <div style="display: flex; flex-wrap: wrap;">
+                                <pill v-for="attribute in item.attributes" :key="attribute.id" :color="attribute.attribute_type?.color??''" :disable-classes="true" style="font-size: 0.75em; font-weight: 500; padding: 0.125em 0.625em; margin: 0.25em; border-radius: 9999em; min-height: 0;">
                                     {{ attribute.title }}
                                 </pill>
                             </div>

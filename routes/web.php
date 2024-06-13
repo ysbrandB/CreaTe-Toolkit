@@ -19,9 +19,24 @@ Route::group(['prefix' => 'items'], function () {
 Route::resource('attribute_types', AttributeTypeController::class)->middleware('auth');
 Route::resource('attributes', AttributeController::class);
 Route::get('/test', function () {
+    $query = Item::query()
+        ->select('json_items', 'id', 'title', 'photo')
+        ->without('attributes');
+    $pythonItem = $query->clone()
+        ->where('id', env('PYTHON_ID'))
+        ->firstOrFail();
+    $items = $query->clone()
+        ->whereNot('id', env('PYTHON_ID'))
+        ->get();
+    $nodes = $query->clone()
+        ->whereIn('id', $items->pluck('json_items')->flatten()->unique())
+        ->whereNotIn('id', $items->pluck('id')->toArray())
+        ->get();
     return Inertia::render('Test', [
-        'items'=>Item::query()->whereNot('id', env('PYTHON_ID'))->select('json_items', 'id', 'title', 'photo')->without('attributes')->get(),
-        'python'=>Item::query()->where('id', env('PYTHON_ID'))->select('json_items', 'id', 'title', 'photo')->without('attributes')->firstOrFail()
+        'items'=> $items,
+        'python'=>$pythonItem,
+        'nodes' => $nodes,
+        'log'=>[$items->pluck('json_items')->flatten()->unique()]
     ]);
 })->name('test');
 

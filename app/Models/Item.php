@@ -70,11 +70,17 @@ class Item extends Model
 
     public function getPhotoUrlAttribute(): string
     {
+        if(!$this->photo){
+            return '';
+        }
         return asset('storage/photos/' . $this->photo);
     }
 
     public function getWiringPhotoUrlAttribute(): string
     {
+        if(!$this->wiring_photo){
+            return '';
+        }
         return asset('storage/photos/' . $this->wiring_photo);
     }
 
