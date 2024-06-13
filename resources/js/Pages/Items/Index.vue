@@ -5,20 +5,31 @@ import {router} from "@inertiajs/vue3";
 import {AttributeType, Item} from "@/types";
 import Card from "@/Components/Card.vue";
 import AttributeFilter from "@/CustomComponents/AttributeFilter.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
+import {computed, Ref, ref, UnwrapRef} from "vue";
+import DangerButton from "@/Components/DangerButton.vue";
+import Pill from "@/CustomComponents/Pill.vue";
 
 const props = defineProps<{
     items: Item[],
+    selectedItems?: Item[],
     attributeTypes: AttributeType[],
     filters: string
 }>();
 
+const selectedItems = ref(new Set<Item>());
 const reloadWithFilters = (filters: object) => {
     router.reload({
         data: {
-            filters: JSON.stringify(filters)
+            filters: JSON.stringify(filters),
         }
     })
 };
+
+const henk = computed(() => {
+    return Array.from(selectedItems.value)
+})
 </script>
 
 <template>
@@ -26,6 +37,14 @@ const reloadWithFilters = (filters: object) => {
         <template #header>
             <div class="flex flex-row justify-between">
                 <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Items</h2>
+                <div class="flex flex-row justify-end">
+                    <primary-button @click="router.get(route('test'), {'selected':henk.map((item:Item)=>item.id)})">
+                        See overview
+                    </primary-button>
+                    <pill :color="''" v-for="item in henk" class="cursor-pointer bg-red-100" @click="selectedItems.delete(item)">
+                        {{ item.title }} <span class="ms-2 text-red-600">x</span>
+                    </pill>
+                </div>
                 <div class="flex flex-row gap-2" v-if="$page.props.auth.user">
                     <NavLink :href="route('items.create')">
                         New item
@@ -49,14 +68,25 @@ const reloadWithFilters = (filters: object) => {
                 </div>
                 <div class="lg:col-span-9 col-span-3">
                     <div class="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4 mt-4">
-                        <NavLink v-for="item in items" class="px-6" :href="route('items.show', item.public_id)">
-                            <div
-                                class="w-full bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg flex !flex-row justify-between">
-
-                                <img :src="item.photo_url" class="w-[50%]" alt="item photo">
-                                <div class="px-2">{{ item.title }}</div>
+                            <div v-for="item in items"
+                                class="w-full bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg flex !flex-row">
+                                <NavLink class="w-[50%]" style="margin: 0; padding: 0" :href="route('items.show', item.public_id)">
+                                    <img :src="item.photo_url" class="w-full h-full object-cover object-center"
+                                         alt="item photo">
+                                </NavLink>
+                                <div
+                                    class="w-[50%] h-full text-center flex flex-col justify-between">
+                                    <NavLink class="px-0 pt-0 w-full mt-2" :href="route('items.show', item.public_id)">
+                                    <div class="w-full h-full">{{ item.title }}</div>
+                                    </NavLink>
+                                    <danger-button v-if="selectedItems.has(item)" @click="selectedItems.delete(item)"
+                                                   class="w-min text-sm px-0 py-0 mb-2 mr-2 self-end"> -
+                                    </danger-button>
+                                    <secondary-button v-else @click="selectedItems.add(item)"
+                                                      class="w-min text-sm px-0 py-0  mb-2 mr-2 self-end"> +
+                                    </secondary-button>
+                                </div>
                             </div>
-                        </NavLink>
                     </div>
                 </div>
             </div>

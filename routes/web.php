@@ -6,6 +6,7 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ProfileController;
 use App\Models\Item;
 use Illuminate\Foundation\Application;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -18,25 +19,35 @@ Route::group(['prefix' => 'items'], function () {
 
 Route::resource('attribute_types', AttributeTypeController::class)->middleware('auth');
 Route::resource('attributes', AttributeController::class);
-Route::get('/test', function () {
+Route::get('/test', function (Request $request) {
     $query = Item::query()
         ->select('json_items', 'id', 'title', 'photo')
         ->without('attributes');
     $pythonItem = $query->clone()
         ->where('id', env('PYTHON_ID'))
         ->firstOrFail();
-    $items = $query->clone()
-        ->whereNot('id', env('PYTHON_ID'))
-        ->get();
+    $items = $query->clone();
+    $selected = $request->input('selected');
+    if ($selected) {
+        $items = $items
+            ->whereIn('id', $selected)
+            ->whereNot('id', env('PYTHON_ID'))
+            ->get();
+    } else {
+        $items = $items->whereNot('id', env('PYTHON_ID'))
+            ->get();
+    }
+
+
     $nodes = $query->clone()
         ->whereIn('id', $items->pluck('json_items')->flatten()->unique())
         ->whereNotIn('id', $items->pluck('id')->toArray())
         ->get();
     return Inertia::render('Test', [
-        'items'=> $items,
-        'python'=>$pythonItem,
+        'items' => $items,
+        'python' => $pythonItem,
         'nodes' => $nodes,
-        'log'=>[$items->pluck('json_items')->flatten()->unique()]
+        'log' => [$items->pluck('json_items')->flatten()->unique()]
     ]);
 })->name('test');
 
@@ -50,4 +61,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
