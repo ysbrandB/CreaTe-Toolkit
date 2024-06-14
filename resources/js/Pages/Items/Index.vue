@@ -2,30 +2,29 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import NavLink from "@/Components/NavLink.vue";
 import {router} from "@inertiajs/vue3";
-import {AttributeType, Item} from "@/types";
+import {Attribute, AttributeType, Item} from "@/types";
 import Card from "@/Components/Card.vue";
 import AttributeFilter from "@/CustomComponents/AttributeFilter.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
-import {computed, Ref, ref, UnwrapRef, watch} from "vue";
+import {ref, watch} from "vue";
 import DangerButton from "@/Components/DangerButton.vue";
 import Pill from "@/CustomComponents/Pill.vue";
 import axios from "axios";
-import se from "../../../../public/build/assets/Index-D-tLGpWy";
 
 const props = defineProps<{
     items: Item[],
     oldSelectedItems?: Item[],
     attributeTypes: AttributeType[],
-    filters: string
+    initialFilters: Record<number, number[]>
 }>();
-
 const selectedItems = ref(new Set<Item>());
-const reloadWithFilters = (filters: object) => {
+const reloadWithFilters = (filters: Record<number, number[]>) => {
     router.reload({
         data: {
-            filters: JSON.stringify(filters),
-        }
+            filters: filters
+        },
+        only: ['items']
     })
 };
 
@@ -66,9 +65,9 @@ watch(selectedItems.value, (selected) => {
                     <card class="mt-4">
                         <div class="w-full text-center">
                             <attribute-filter
-                                @update:checked-attributes="reloadWithFilters"
+                                @update="reloadWithFilters"
                                 :attribute-types="attributeTypes"
-                                :checked-attributes="JSON.parse(props.filters) ?? {}"/>
+                                :initial-filters="initialFilters"/>
                         </div>
                     </card>
                 </div>

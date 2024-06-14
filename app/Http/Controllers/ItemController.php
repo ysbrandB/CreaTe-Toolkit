@@ -15,22 +15,18 @@ class ItemController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-    {
+    {   $items = Item::query();
         $filters = $request->input('filters');
-        $items = Item::query();
-        foreach (json_decode($filters) ?? (object)[] as $attributeCategoryId => $attributeCategory) {
-            if ($attributeCategory->attributes) {
-                $items->whereHas('attributes', function ($query) use ($attributeCategoryId, $attributeCategory) {
-                    $query->where('attribute_type_id', $attributeCategoryId)->whereIn('attributes.id', array_column($attributeCategory->attributes, 'id'));
-                });
-            }
+        foreach($filters??[] as $attributeCategoryId => $attribiteIds) {
+            $items->whereHas('attributes', function ($query) use ($attributeCategoryId, $attribiteIds) {
+                $query->where('attribute_type_id', $attributeCategoryId)->whereIn('attributes.id', $attribiteIds);
+            });
         }
-
         return Inertia::render('Items/Index', [
             'oldSelectedItems'=> $request->session()->get('selected'),
             'items' => $items->get(),
             'attributeTypes' => AttributeType::with('attributes')->orderBy('created_at', 'desc')->get(),
-            'filters' => $filters,
+            'initialFilters' => $filters,
         ]);
     }
 
@@ -84,19 +80,24 @@ class ItemController extends Controller
      */
     public function edit(int $id)
     {
+        $attributeTypes = AttributeType::whereHas('attributes', function ($attributes) use ($id) {
+            $attributes->whereHas('items', function ($query) use ($id) {
+                $query->where('items.id', $id);
+            });
+        })->with(['attributes' => function ($attributes) use ($id) {
+            $attributes->whereHas('items', function ($query) use ($id) {
+                $query->where('items.id', $id);
+            })->select('attribute_type_id', 'id');
+        }])->select('id')->get();
+        $myAttributes = new \stdClass();
+        foreach ($attributeTypes as $attributeType) {
+            $myAttributes->{$attributeType->id} = $attributeType->attributes->pluck('id');
+        }
         return Inertia::render('Items/Edit', [
             'item' => Item::with('attributes')->findorFail($id),
             'items' => Item::query()->select('id', 'title')->get(),
             'attributeTypes' => AttributeType::with('attributes')->get(),
-            'myAttributes' => AttributeType::whereHas('attributes', function ($attributes) use ($id) {
-                $attributes->whereHas('items', function ($query) use ($id) {
-                    $query->where('items.id', $id);
-                });
-            })->with(['attributes' => function ($attributes) use ($id) {
-                $attributes->whereHas('items', function ($query) use ($id) {
-                    $query->where('items.id', $id);
-                });
-            }])->get(),
+            'myAttributes' => $myAttributes,
         ]);
     }
 

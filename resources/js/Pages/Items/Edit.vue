@@ -18,33 +18,19 @@ const props = defineProps<{
     items: Item[],
     myAttributes: any
 }>();
-
-const initialSelectedAttributes = {} as Record<string, { color: string, attributes: Attribute[] | undefined }>;
-props.myAttributes?.forEach((attributeType: AttributeType) => {
-    initialSelectedAttributes[attributeType.id.toString()] = {
-        color: attributeType.color,
-        attributes: attributeType.attributes
-    };
-});
-
-const selectedAttributes = ref<Record<string, {
-    color: string,
-    attributes: Attribute[] | undefined
-}>>(initialSelectedAttributes);
-
-const flattenedSelectedAttributes = computed(() => {
-    let flattened: number[] = [];
-    Object.values(selectedAttributes.value).forEach((attributeType: { attributes: Attribute[] | undefined }) => {
-        if (attributeType.attributes === undefined) return;
-        attributeType.attributes.forEach((attribute: Attribute) => {
-            flattened.push(attribute.id);
-        });
-    });
-    return flattened;
-});
 const addSelectedItem = (item: number, idx: number) => {
     // @ts-ignore
     form.edges[idx] = item;
+}
+
+const flattenAttributeIds = (attributeIds: Record<number, number[]>) => {
+    const allAttributes: number[] = []
+    for (const [_, attributes] of Object.entries(attributeIds)) {
+        attributes.forEach((attributeId) => {
+            allAttributes.push(attributeId)
+        });
+    }
+    return allAttributes;
 }
 
 const form = useForm({
@@ -59,13 +45,14 @@ const form = useForm({
     software_considerations: props.item?.software_considerations ?? '',
     example_code: props.item?.example_code ?? '',
     edges: props.item?.json_items ?? [],
-    attributes: flattenedSelectedAttributes.value,
+    attributes: [],
     photo: '',
     wiring_photo: '',
 });
 
 function handlePhotoChange(e: any) {
     form.photo = e.target.files[0]
+    console.log(form.photo)
 }
 
 function handleWiringPhotoChange(e: any) {
@@ -74,9 +61,14 @@ function handleWiringPhotoChange(e: any) {
 
 const submit = () => {
     if (props.item) {
-        router.put(route('items.update', props.item.id), form.data());
+        form._method = 'put'
+        router.post(route('items.update', props.item.id), form.data(), {
+            forceFormData: true,
+        });
     } else {
-        router.post(route('items.store'), form.data());
+        router.post(route('items.store'), form.data(),{
+            forceFormData: true,
+        });
     }
 }
 </script>
@@ -191,10 +183,10 @@ const submit = () => {
                         <attribute-filter
                             title="attributes"
                             :attribute-types="props.attributeTypes"
-                            :checked-attributes="initialSelectedAttributes"
-                            @update:checked-attributes="
+                            :initial-filters="props.myAttributes"
+                            @update="
                             // @ts-ignore
-                            selectedAttributes=$event; form.attributes = flattenedSelectedAttributes"/>
+                            form.attributes=flattenAttributeIds($event)"/>
                     </div>
                 </card>
                 <card>
