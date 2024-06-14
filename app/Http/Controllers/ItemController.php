@@ -23,7 +23,7 @@ class ItemController extends Controller
             });
         }
         return Inertia::render('Items/Index', [
-            'oldSelectedItems'=> $request->session()->get('selected'),
+            'initialSelectedItems'=> Item::whereIn('id', $request->session()->get('selected'))->get(),
             'items' => $items->get(),
             'attributeTypes' => AttributeType::with('attributes')->orderBy('created_at', 'desc')->get(),
             'initialFilters' => $filters,

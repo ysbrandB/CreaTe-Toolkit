@@ -14,11 +14,11 @@ import axios from "axios";
 
 const props = defineProps<{
     items: Item[],
-    oldSelectedItems?: Item[],
+    initialSelectedItems?: Item[],
     attributeTypes: AttributeType[],
-    initialFilters: Record<number, number[]>
+    initialFilters: Record<number, number[]>,
 }>();
-const selectedItems = ref(new Set<Item>());
+const selectedItems = ref(new Set<Item>(props.initialSelectedItems??[]));
 const reloadWithFilters = (filters: Record<number, number[]>) => {
     router.reload({
         data: {
@@ -29,7 +29,6 @@ const reloadWithFilters = (filters: Record<number, number[]>) => {
 };
 
 watch(selectedItems.value, (selected) => {
-    console.log(`selectedItems is ${Array.from(selected).map((item: Item) => item.id)}`)
     axios.post(route('graph.syncSelected'), {
         selected: Array.from(selected).map((item: Item) => item.id)
     });
@@ -43,7 +42,7 @@ watch(selectedItems.value, (selected) => {
                 <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Items</h2>
                 <div class="flex flex-row justify-end">
                     <primary-button
-                        @click="router.get(route('graph.index'), {'selected': Array.from(selectedItems).map((item: Item) => item.id)})">
+                        @click="router.get(route('graph.index'))">
                         See overview
                     </primary-button>
                     <pill :color="''" v-for="item in selectedItems" class="cursor-pointer bg-red-100"
