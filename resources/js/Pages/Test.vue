@@ -1,15 +1,6 @@
 <script setup lang="ts">
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import {Head, router} from '@inertiajs/vue3';
-
-const props = defineProps<{
-    items: Item[],
-    nodes: Item[]
-    python: Item,
-    log?: any
-}>();
-if(props.log)
-    console.log(props.log);
 import {Configs, Edges, VNetworkGraph} from "v-network-graph"
 import "v-network-graph/lib/style.css"
 import 'd3-force';
@@ -34,6 +25,12 @@ interface Edge extends vNG.Edge {
     color?: string
     dashed?: boolean
 }
+
+const props = defineProps<{
+    items: Item[],
+    nodes: Item[]
+    python: Item,
+}>();
 
 const myEdges: Set<Edge> = new Set<Edge>();
 const nodes = reactive({})

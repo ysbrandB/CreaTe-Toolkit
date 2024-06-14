@@ -48,6 +48,7 @@ const addSelectedItem = (item: number, idx: number) => {
 }
 
 const form = useForm({
+    _method: 'post',
     title: props.item?.title ?? '',
     description: props.item?.description ?? '',
     card_description: props.item?.card_description ?? '',
@@ -72,30 +73,12 @@ function handleWiringPhotoChange(e: any) {
 }
 
 const submit = () => {
-    const formData = new FormData();
-    Object.keys(form.data()).forEach(key => {
-        // @ts-ignore
-        formData.append(key, form.data()[key]);
-    });
-    if (props.item) formData.append('_method', 'put');
-    console.log(...formData.entries());
-    let postRoute = props.item ? route('items.update', props.item.id) : route('items.store');
-    axios.post(postRoute, formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data'
-        }
-    }).then((data) => {
-            if (data.status === 200) {
-                if(props.item)
-                    return router.get(route('items.show', props.item.public_id));
-                return router.get(route('items.index'));
-            }
-            console.log(data);
-        }
-    ).catch((error) => {
-        console.log(error);
-    });
-};
+    if (props.item) {
+        router.put(route('items.update', props.item.id), form.data());
+    } else {
+        router.post(route('items.store'), form.data());
+    }
+}
 </script>
 
 <template>

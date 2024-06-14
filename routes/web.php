@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AttributeController;
 use App\Http\Controllers\AttributeTypeController;
+use App\Http\Controllers\GraphController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ProfileController;
 use App\Models\Item;
@@ -19,37 +20,10 @@ Route::group(['prefix' => 'items'], function () {
 
 Route::resource('attribute_types', AttributeTypeController::class)->middleware('auth');
 Route::resource('attributes', AttributeController::class);
-Route::get('/test', function (Request $request) {
-    $query = Item::query()
-        ->select('json_items', 'id', 'title', 'photo')
-        ->without('attributes');
-    $pythonItem = $query->clone()
-        ->where('id', env('PYTHON_ID'))
-        ->firstOrFail();
-    $items = $query->clone();
-    $selected = $request->input('selected');
-    if ($selected) {
-        $items = $items
-            ->whereIn('id', $selected)
-            ->whereNot('id', env('PYTHON_ID'))
-            ->get();
-    } else {
-        $items = $items->whereNot('id', env('PYTHON_ID'))
-            ->get();
-    }
-
-
-    $nodes = $query->clone()
-        ->whereIn('id', $items->pluck('json_items')->flatten()->unique())
-        ->whereNotIn('id', $items->pluck('id')->toArray())
-        ->get();
-    return Inertia::render('Test', [
-        'items' => $items,
-        'python' => $pythonItem,
-        'nodes' => $nodes,
-        'log' => [$items->pluck('json_items')->flatten()->unique()]
-    ]);
-})->name('test');
+Route::group(['prefix' => 'graph'], function () {
+    Route::get('/', [GraphController::class, 'index'])->name('graph.index');
+    Route::post('/syncSelected', [GraphController::class, 'syncSelected'])->name('graph.syncSelected');
+});
 
 Route::get('/choice-helper', function () {
     return Inertia::render('Dashboard');

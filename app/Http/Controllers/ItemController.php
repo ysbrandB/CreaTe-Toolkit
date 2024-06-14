@@ -27,6 +27,7 @@ class ItemController extends Controller
         }
 
         return Inertia::render('Items/Index', [
+            'oldSelectedItems'=> $request->session()->get('selected'),
             'items' => $items->get(),
             'attributeTypes' => AttributeType::with('attributes')->orderBy('created_at', 'desc')->get(),
             'filters' => $filters,
@@ -55,15 +56,11 @@ class ItemController extends Controller
         $wiringPhoto?->storeAs('photos/' . $photo->hashName(), ['disk' => 'public']);
         $item = new Item();
         $item->fill($request->except('attributes', 'photo', 'wiring_photo', 'json_items'));
-        $json_items = explode(',', $request->input('edges'));
-        if ($json_items[0] !== "") {
-            $item->json_items = array_map('intval',$json_items);
-        }
+        $item->json_items = $request->input('edges') ?? [];
         $item->photo = $photo?->hashName();
         $item->wiring_photo = $wiringPhoto?->hashName();
         $item->save();
-        $string = explode(',', $request->input('attributes'));
-        $item->attributes()->sync($string[0] === "" ? [] : $string);
+        $item->attributes()->sync($request->input('attributes')??[]);
         return to_route('items.show', ['public_id' => $item->public_id]);
     }
 
@@ -131,13 +128,9 @@ class ItemController extends Controller
         }
 
         $item->fill($request->except('attributes', 'photo', 'wiring_photo', 'json_items'));
-        $json_items = explode(',', $request->input('edges'));
-        if ($json_items[0] !== "") {
-            $item->json_items = array_map('intval',$json_items);
-        }
+        $item->json_items = $request->input('edges') ?? [];
         $item->save();
-        $string = explode(',', $request->input('attributes'));
-        $item->attributes()->sync($string[0] === "" ? [] : $string);
+        $item->attributes()->sync($request->input('attributes')??[]);
         return to_route('items.show', ['public_id' => $item->public_id]);
     }
 
