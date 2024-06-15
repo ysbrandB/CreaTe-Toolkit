@@ -25,25 +25,25 @@ jobs:
 
       - uses: ramsey/composer-install@v3
 
+      - run: mkdir -p .tmp/rector
+
       - uses: actions/cache@v3
         with:
           path: .tmp/rector
           key: ${{ runner.os }}-rector-${{ github.run_id }}
           restore-keys: ${{ runner.os }}-rector-
 
-      - run: mkdir -p .tmp/rector
-
       - name: Run rector
         run: vendor/bin/rector --ansi
+
+      - run: mkdir -p .tmp/pint
 
       - name: Cache Pint
         uses: actions/cache@v3
         with:
           path: .tmp/pint.cache
-          key: ${{ runner.os }}-pint-${{ hashFiles('**/composer.lock') }}
+          key: ${{ runner.os }}-pint-${{ github.run_id }}
           restore-keys: ${{ runner.os }}-pint-
-
-      - run: mkdir -p .tmp/pint
 
       - name: Run pint
         run: ./vendor/bin/pint
@@ -65,7 +65,7 @@ jobs:
           MYSQL_USER: user
           MYSQL_PASSWORD: password
         ports:
-          - 3306:3306
+          - 3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     steps:
       - uses: actions/checkout@v3
@@ -80,6 +80,12 @@ jobs:
 
       - uses: ramsey/composer-install@v3
       - name: 🐘 Run PHP tests
+        env:
+          DB_PORT: ${{ job.services.mysql.ports[3306] }}
+          DB_CONNECTION: mysql
+          DB_DATABASE: test_db
+          DB_USERNAME: user
+          DB_PASSWORD: password
         run: (php artisan key:generate && php artisan migrate && php artisan test)
 
 
