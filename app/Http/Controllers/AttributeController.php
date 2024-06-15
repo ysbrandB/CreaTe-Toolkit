@@ -26,7 +26,8 @@ class AttributeController extends Controller
     public function store(Request $request)
     {
         $id = Attribute::create($request->all())->id;
-        return to_route('attributes.edit',$id);
+
+        return to_route('attributes.edit', $id);
     }
 
     public function show($id)
@@ -36,6 +37,7 @@ class AttributeController extends Controller
     public function edit($id)
     {
         $attribute = Attribute::findOrFail($id);
+
         return Inertia::render('Attributes/Edit', [
             'attributeTypes' => AttributeType::all(),
             'attribute' => $attribute,
@@ -46,6 +48,7 @@ class AttributeController extends Controller
     {
         $attribute = Attribute::findOrFail($id);
         $attribute->update($request->all());
+
         return to_route('attributes.index');
     }
 
@@ -54,6 +57,7 @@ class AttributeController extends Controller
         $attribute = Attribute::findOrFail($id);
         $attribute->items()->detach();
         $attribute->delete();
+
         return to_route('attributes.index');
     }
 }

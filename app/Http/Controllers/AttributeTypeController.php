@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\AttributeType;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Inertia\Response;
 
 class AttributeTypeController extends Controller
 {
@@ -24,7 +23,8 @@ class AttributeTypeController extends Controller
     public function store(Request $request)
     {
         $id = AttributeType::create($request->all())->id;
-        return to_route('attribute_types.edit',$id);
+
+        return to_route('attribute_types.edit', $id);
     }
 
     public function show($id)
@@ -34,6 +34,7 @@ class AttributeTypeController extends Controller
     public function edit($id)
     {
         $attributeType = AttributeType::findOrFail($id);
+
         return Inertia::render('AttributeTypes/Edit',
             ['colors' => AttributeType::$colors, 'attributeType' => $attributeType]);
     }
@@ -42,6 +43,7 @@ class AttributeTypeController extends Controller
     {
         $attributeType = AttributeType::findOrFail($id);
         $attributeType->update($request->all());
+
         return to_route('attribute_types.index');
     }
 
@@ -52,7 +54,9 @@ class AttributeTypeController extends Controller
             $attribute->items()->detach();
             $attribute->delete();
         }
+
         $attributeType->delete();
+
         return to_route('attribute_types.index');
     }
 }

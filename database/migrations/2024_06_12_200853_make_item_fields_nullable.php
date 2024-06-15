@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -11,7 +10,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('items', function ($table){
+        Schema::table('items', function ($table) {
             $table->text('description')->nullable()->change();
             $table->text('card_description')->nullable()->change();
             $table->text('pros')->nullable()->change();
@@ -29,7 +28,7 @@ return new class extends Migration
     public function down(): void
     {
         //reverse up
-        Schema::table('items', function ($table){
+        Schema::table('items', function ($table) {
             $table->text('description')->change();
             $table->text('card_description')->change();
             $table->text('pros')->change();

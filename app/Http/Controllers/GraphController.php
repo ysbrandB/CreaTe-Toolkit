@@ -33,6 +33,7 @@ class GraphController extends Controller
             ->whereIn('id', $items->pluck('json_items')->flatten()->unique())
             ->whereNotIn('id', $items->pluck('id')->toArray())
             ->get();
+
         return Inertia::render('Test', [
             'items' => $items,
             'python' => $pythonItem,
@@ -40,7 +41,7 @@ class GraphController extends Controller
         ]);
     }
 
-    public function syncSelected(Request $request)
+    public function syncSelected(Request $request): void
     {
         $selected = $request->input('selected');
         // add the selected items to the selected items in this session

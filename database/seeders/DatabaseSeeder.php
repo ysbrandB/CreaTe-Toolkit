@@ -4,11 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\Attribute;
 use App\Models\AttributeType;
-use App\Models\Edge;
 use App\Models\Item;
-use App\Models\Processor;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -23,7 +20,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Admin',
                 'email' => 'ysbrand@example.com',
-                'password' =>  Hash::make('password'),
+                'password' => Hash::make('password'),
             ]
         );
 
@@ -60,13 +57,12 @@ class DatabaseSeeder extends Seeder
             Attribute::factory()->count(5)
         )->create();
 
-
         Item::factory()->create([
-            'title'=>'Python',
+            'title' => 'Python',
         ]);
 
         $items = Item::factory(10)->create();
-        for($i = 2; $i < 11-3; $i+=3) {
+        for ($i = 2; $i < 11 - 3; $i += 3) {
             $item = $items[$i];
             $item->json_items = [$i, $i + 1, $i + 2];
             $item->save();

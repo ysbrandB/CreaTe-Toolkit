@@ -2,15 +2,15 @@
 
 namespace Tests\Feature;
 
+use App\Models\Item;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
-use App\Models\Item;
 
 class ItemUpdateTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_it_stores_a_new_item(): void
     {
@@ -60,11 +60,13 @@ class ItemUpdateTest extends TestCase
         $this->assertEquals([], $item->attributes()->get()->toArray());
     }
 
+    /**
+     * @throws \JsonException
+     */
     public function test_it_updates_an_existing_item(): void
     {
         // Create an item
         $item = Item::factory()->create();
-
         // Form data
         $formData = [
             'title' => 'Updated Title',

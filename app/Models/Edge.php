@@ -13,7 +13,7 @@ class Edge extends Model
     protected $fillable = [
         'from_item_id',
         'to_item_id',
-        'belongsto_item_id'
+        'belongsto_item_id',
     ];
 
     public function fromItem(): BelongsTo

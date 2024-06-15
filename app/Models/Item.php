@@ -2,19 +2,19 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\HigherOrderCollectionProxy;
 use Vinkla\Hashids\Facades\Hashids;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property string name
  * @property string description
  * @property string card_description
  * @property string public_id
- * @property boolean is_actuator
+ * @property bool is_actuator
  * @property string photo
  * @property string pros
  * @property string cons
@@ -26,9 +26,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string photo_url
  * @property string wiring_photo_url
  * @property mixed json_items
- *
  */
-
 class Item extends Model
 {
     use HasFactory;
@@ -48,10 +46,11 @@ class Item extends Model
         'example_code',
         'photo',
         'is_actuator',
-        'json_items'
+        'json_items',
     ];
 
     protected $with = ['attributes'];
+
     protected $appends = ['public_id', 'photo_url', 'wiring_photo_url'];
 
     protected $casts = [
@@ -70,18 +69,20 @@ class Item extends Model
 
     public function getPhotoUrlAttribute(): string
     {
-        if(!$this->photo){
+        if (! $this->photo) {
             return '';
         }
-        return asset('storage/photos/' . $this->photo);
+
+        return asset('storage/photos/'.$this->photo);
     }
 
     public function getWiringPhotoUrlAttribute(): string
     {
-        if(!$this->wiring_photo){
+        if (! $this->wiring_photo) {
             return '';
         }
-        return asset('storage/photos/' . $this->wiring_photo);
+
+        return asset('storage/photos/'.$this->wiring_photo);
     }
 
     public function getPublicIdAttribute(): string

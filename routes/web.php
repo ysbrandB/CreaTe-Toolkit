@@ -2,37 +2,33 @@
 
 use App\Http\Controllers\AttributeController;
 use App\Http\Controllers\AttributeTypeController;
-use App\Http\Controllers\GraphController;
 use App\Http\Controllers\ItemController;
-use App\Http\Controllers\ProfileController;
 use App\Models\Item;
-use Illuminate\Foundation\Application;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::resource('items', ItemController::class)->except(['show', 'index'])->middleware('auth');
 //item route that takes the hashid and returns the item
-Route::get('/', [ItemController::class, 'index'])->name('items.index');
-Route::group(['prefix' => 'items'], function () {
-    Route::get('/item/{public_id}', [ItemController::class, 'show'])->name('items.show');
+Route::get('/', static fn (\Illuminate\Http\Request $request) => (new \App\Http\Controllers\ItemController())->index($request))->name('items.index');
+Route::group(['prefix' => 'items'], static function (): void {
+    Route::get('/item/{public_id}', static fn (string $publicId) => (new \App\Http\Controllers\ItemController())->show($publicId))->name('items.show');
 });
 
 Route::resource('attribute_types', AttributeTypeController::class)->middleware('auth');
 Route::resource('attributes', AttributeController::class);
-Route::group(['prefix' => 'graph'], function () {
-    Route::get('/', [GraphController::class, 'index'])->name('graph.index');
-    Route::post('/syncSelected', [GraphController::class, 'syncSelected'])->name('graph.syncSelected');
+Route::group(['prefix' => 'graph'], static function (): void {
+    Route::get('/', static fn (\Illuminate\Http\Request $request) => (new \App\Http\Controllers\GraphController())->index($request))->name('graph.index');
+    Route::post('/syncSelected', static function (\Illuminate\Http\Request $request): void {
+        (new \App\Http\Controllers\GraphController())->syncSelected($request);
+    })->name('graph.syncSelected');
 });
 
-Route::get('/choice-helper', function () {
-    return Inertia::render('Dashboard');
-})->name('dashboard');
+Route::get('/choice-helper', static fn () => Inertia::render('Dashboard'))->name('dashboard');
 
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+Route::middleware('auth')->group(static function (): void {
+    Route::get('/profile', static fn (\Illuminate\Http\Request $request): \Inertia\Response => (new \App\Http\Controllers\ProfileController())->edit($request))->name('profile.edit');
+    Route::patch('/profile', static fn (\App\Http\Requests\ProfileUpdateRequest $profileUpdateRequest): \Illuminate\Http\RedirectResponse => (new \App\Http\Controllers\ProfileController())->update($profileUpdateRequest))->name('profile.update');
+    Route::delete('/profile', static fn (\Illuminate\Http\Request $request): \Illuminate\Http\RedirectResponse => (new \App\Http\Controllers\ProfileController())->destroy($request))->name('profile.destroy');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

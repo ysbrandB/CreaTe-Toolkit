@@ -19,6 +19,7 @@ class Processor extends Model
     use HasFactory;
 
     protected $fillable = ['title'];
+
     public function item(): BelongsTo
     {
         return $this->belongsTo(HasMany::class, 'item_id');
