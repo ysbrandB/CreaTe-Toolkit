@@ -153,15 +153,16 @@ jobs:
           exclusions: 'storage/* build/* node_modules/*'
       - name: ➗ Calculate checksum
         run: openssl md5 ${{ env.BUILD_ARTIFACT_STAGING_DIR }}build.zip | cut -d" " -f2 > ${{ env.BUILD_ARTIFACT_STAGING_DIR }}checksum.txt
-      - name: 📂 Sync Files
-        uses: SamKirkland/web-deploy@v1
+
+      - name: 📂 Sync files
+        uses: SamKirkland/FTP-Deploy-Action@4.1.0
         with:
-          target-server: ${{ secrets.HOST_SERVER }}
-          remote-user: ${{ secrets.SSH_USER }}
-          private-ssh-key: ${{ secrets.SSH_KEY }}
-          destination-path: ${{ env.BUILD_ARTIFACT_DESTINATION_DIR }}
-          source-path: ${{ env.BUILD_ARTIFACT_STAGING_DIR }}
-          ssh-port: ${{ secrets.SSH_PORT }}
+            server: ${{ secrets.HOST_SERVER }}
+            username: ${{ secrets.FTP_USER }}
+            password: ${{ secrets.FTP_PASSWORD }}
+            local-dir: ${{ env.BUILD_ARTIFACT_STAGING_DIR }}
+            server-dir: ${{ env.BUILD_ARTIFACT_DESTINATION_DIR }}
+
       - name: 🚀 Run deploy script
         uses: appleboy/ssh-action@v1.0.3
         with:
