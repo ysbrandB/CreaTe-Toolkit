@@ -79,6 +79,18 @@ jobs:
         run: (grep -E 'PHP_VERSION' .env.prod >> $GITHUB_ENV && cp .env.ci .env)
 
       - uses: ramsey/composer-install@v3
+
+      - name: 🖱️ Set Node v${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: 📥 Install front-end dependencies
+        run: npm ci --ignore-scripts
+      - name: 🔨 build front-end
+        run: npm run build
+
       - name: 🐘 Run PHP tests
         env:
           DB_PORT: ${{ job.services.mysql.ports[3306] }}
@@ -87,12 +99,17 @@ jobs:
           DB_USERNAME: user
           DB_PASSWORD: password
         run: (php artisan key:generate && php artisan migrate && php artisan test)
+      - uses: actions/upload-artifact@v1
+        if: failure()
+        with:
+          name: laravel-failure-artifact
+          path: storage/logs/laravel.log
 
 
   deploy:
     needs:
-        - fix-php
-        - test
+      - fix-php
+      - test
     name: Deploy
     runs-on: ubuntu-latest
     env:
