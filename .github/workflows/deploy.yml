@@ -60,10 +60,10 @@ jobs:
       mysql:
         image: mysql
         env:
+          MYSQL_ROOT_PASSWORD: password
           MYSQL_DATABASE: test_db
           MYSQL_USER: user
           MYSQL_PASSWORD: password
-          MYSQL_ROOT_PASSWORD: rootpassword
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
@@ -76,15 +76,10 @@ jobs:
           php-version: ${{ env.PHP_VERSION }}
           coverage: none
       - name: 🔍 Read .env
-        run: grep -E 'PHP_VERSION' .env.prod >> $GITHUB_ENV
+        run: (grep -E 'PHP_VERSION' .env.prod >> $GITHUB_ENV && cp .env.ci .env)
 
       - uses: ramsey/composer-install@v3
       - name: 🐘 Run PHP tests
-        env:
-          DB_HOST: 127.0.0.1
-          DB_DATABASE: test_db
-          DB_USERNAME: user
-          DB_PASSWORD: password
         run: (php artisan key:generate && php artisan migrate && php artisan test)
 
 
