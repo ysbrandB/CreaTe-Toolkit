@@ -162,13 +162,3 @@ jobs:
             password: ${{ secrets.FTP_PASSWORD }}
             local-dir: ${{ env.BUILD_ARTIFACT_STAGING_DIR }}
             server-dir: ${{ env.BUILD_ARTIFACT_DESTINATION_DIR }}
-
-      - name: 🚀 Run deploy script
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.HOST_SERVER }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.SSH_PORT }}
-          passphrase: ${{ secrets.SSH_PASSPHRASE }}
-          script: (cd /domains/ysbrand.dev/deployment && ./deploy.sh)
