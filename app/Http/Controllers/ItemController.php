@@ -17,8 +17,6 @@ class ItemController extends Controller
      */
     public function index(Request $request)
     {
-        //        return File::json(base_path('questions.json'))['name'];
-
         $builder = Item::query()->with('attributes.attributeType');
         $filters = $request->input('filters');
         foreach ($filters ?? [] as $attributeCategoryId => $attributeIds) {
@@ -32,6 +30,7 @@ class ItemController extends Controller
             'items' => $builder->get(),
             'attributeTypes' => AttributeType::with('attributes')->orderBy('created_at', 'desc')->get(),
             'initialFilters' => $filters,
+            'questions' => json_decode(File::get(base_path('questions.json'))),
         ]);
     }
 
