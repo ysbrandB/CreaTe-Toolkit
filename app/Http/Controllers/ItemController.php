@@ -17,9 +17,9 @@ class ItemController extends Controller
      */
     public function index(Request $request)
     {
-//        return File::json(base_path('questions.json'))['name'];
+        //        return File::json(base_path('questions.json'))['name'];
 
-        $builder = Item::query()->with( 'attributes.attributeType');
+        $builder = Item::query()->with('attributes.attributeType');
         $filters = $request->input('filters');
         foreach ($filters ?? [] as $attributeCategoryId => $attributeIds) {
             $builder->whereHas('attributes', static function ($query) use ($attributeCategoryId, $attributeIds): void {
