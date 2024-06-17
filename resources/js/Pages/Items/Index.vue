@@ -11,6 +11,7 @@ import {ref, watch} from "vue";
 import DangerButton from "@/Components/DangerButton.vue";
 import Pill from "@/CustomComponents/Pill.vue";
 import axios from "axios";
+import ItemCard from "@/Pages/Items/ItemCard.vue";
 
 const props = defineProps<{
     items: Item[],
@@ -72,26 +73,16 @@ watch(selectedItems.value, (selected) => {
                 </div>
                 <div class="lg:col-span-9 col-span-3">
                     <div class="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4 mt-4">
-                        <div v-for="item in items"
-                             class="w-full bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg flex !flex-row">
-                            <NavLink class="w-[50%]" style="margin: 0; padding: 0"
-                                     :href="route('items.show', item.public_id)">
-                                <img :src="item.photo_url" class="w-full h-full object-cover object-center"
-                                     alt="item photo">
-                            </NavLink>
-                            <div
-                                class="w-[50%] h-full text-center flex flex-col justify-between">
-                                <NavLink class="px-0 pt-0 w-full mt-2" :href="route('items.show', item.public_id)">
-                                    <div class="w-full h-full">{{ item.title }}</div>
-                                </NavLink>
-                                <danger-button v-if="selectedItems.has(item)" @click="selectedItems.delete(item)"
-                                               class="w-min text-sm px-0 py-0 mb-2 mr-2 self-end"> -
-                                </danger-button>
-                                <secondary-button v-else @click="selectedItems.add(item)"
-                                                  class="w-min text-sm px-0 py-0  mb-2 mr-2 self-end"> +
-                                </secondary-button>
-                            </div>
-                        </div>
+                            <item-card :item="item" v-for="item in items">
+                                <template #qr>
+                                    <danger-button v-if="selectedItems.has(item)" @click="selectedItems.delete(item)"
+                                                   class="w-min text-sm px-0 py-0 mb-2 mr-2 self-end"> -
+                                    </danger-button>
+                                    <secondary-button v-else @click="selectedItems.add(item)"
+                                                      class="w-min text-sm px-0 py-0  mb-2 mr-2 self-end"> +
+                                    </secondary-button>
+                                </template>
+                            </item-card>
                     </div>
                 </div>
             </div>

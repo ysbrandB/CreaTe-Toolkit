@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AttributeType;
 use App\Models\Item;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Vinkla\Hashids\Facades\Hashids;
@@ -16,7 +17,9 @@ class ItemController extends Controller
      */
     public function index(Request $request)
     {
-        $builder = Item::query();
+//        return File::json(base_path('questions.json'))['name'];
+
+        $builder = Item::query()->with( 'attributes.attributeType');
         $filters = $request->input('filters');
         foreach ($filters ?? [] as $attributeCategoryId => $attributeIds) {
             $builder->whereHas('attributes', static function ($query) use ($attributeCategoryId, $attributeIds): void {

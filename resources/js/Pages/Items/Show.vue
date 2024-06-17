@@ -29,7 +29,6 @@ const renderMarkdown = (markdown: string | undefined) => marked(markdown ?? '');
     <AuthenticatedLayout>
         <template #header>
             <div class="flex !flex-row justify-between items-center">
-
                 <div>
                     <h2 class="font-semibold text-2xl font-bold text-gray-800 dark:text-gray-200 leading-tight">
                         {{ item.title }}</h2>
@@ -93,7 +92,7 @@ const renderMarkdown = (markdown: string | undefined) => marked(markdown ?? '');
                         </template>
                     </OpeningCard>
                 </div>
-                <div class="col-span-3 md:pt-0 mt-4">
+                <div class="col-span-3 md:pt-0">
                     <item-card :item="item"/>
                 </div>
             </div>
