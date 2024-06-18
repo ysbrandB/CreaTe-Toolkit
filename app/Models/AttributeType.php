@@ -22,6 +22,8 @@ class AttributeType extends Model
 
     protected $fillable = ['title', 'description', 'color'];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     public function attributes(): HasMany
     {
         return $this->hasMany(Attribute::class);

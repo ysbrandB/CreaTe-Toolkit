@@ -16,6 +16,8 @@ class Edge extends Model
         'belongsto_item_id',
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     public function fromItem(): BelongsTo
     {
         return $this->belongsTo(Attribute::class, 'from_item_id');

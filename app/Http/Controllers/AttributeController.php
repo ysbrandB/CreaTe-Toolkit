@@ -30,10 +30,6 @@ class AttributeController extends Controller
         return to_route('attributes.edit', $id);
     }
 
-    public function show($id)
-    {
-    }
-
     public function edit($id)
     {
         $attribute = Attribute::findOrFail($id);

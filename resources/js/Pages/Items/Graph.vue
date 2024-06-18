@@ -4,7 +4,7 @@ import {Head, router} from '@inertiajs/vue3';
 import {Configs, Edges, VNetworkGraph} from "v-network-graph"
 import "v-network-graph/lib/style.css"
 import 'd3-force';
-import {reactive} from "vue"
+import {reactive, ref, watch} from "vue"
 import * as vNG from "v-network-graph"
 import {
     ForceLayout,
@@ -13,6 +13,9 @@ import {
 } from "v-network-graph/lib/force-layout"
 import Card from "@/Components/Card.vue";
 import {Item} from "@/types";
+import SelectedItemDropdown from "@/CustomComponents/SelectedItemDropdown.vue";
+import axios from "axios";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
 
 interface Node extends vNG.Node {
     size?: number
@@ -30,17 +33,23 @@ const props = defineProps<{
     items: Item[],
     nodes: Item[]
     python: Item,
+    initialSelectedItems?: Item[],
 }>();
 
+const selectedItems = ref(new Set<Item>(props.initialSelectedItems ?? []));
 const myEdges: Set<Edge> = new Set<Edge>();
 const nodes = reactive({})
 const edges = reactive({})
-if(props.python) {
+if (props.python) {
     //@ts-ignore
-    nodes[`node${props.python.id}`] = {name: props.python.title, photo_url: props.python.photo_url, public_id: props.python.public_id}
+    nodes[`node${props.python.id}`] = {
+        name: props.python.title,
+        photo_url: props.python.photo_url,
+        public_id: props.python.public_id
+    }
 }
 
-const addNode = (item: Item) =>{
+const addNode = (item: Item) => {
     const node: Node = {name: item.title, photo_url: item.photo_url, public_id: item.public_id};
     //@ts-ignore
     nodes[`node${item.id}`] = node;
@@ -48,10 +57,10 @@ const addNode = (item: Item) =>{
 
 props.items.forEach((item: Item) => {
     addNode(item)
-    const list = [item.id, ...item.json_items??[], props.python.id]
-    for(let i=0; i<list.length - 1; i++){
+    const list = [item.id, ...item.json_items ?? [], props.python.id]
+    for (let i = 0; i < list.length - 1; i++) {
         //@ts-ignore
-        myEdges.add({source: `node${list[i]}`, target: `node${list[i+1]}`})
+        myEdges.add({source: `node${list[i]}`, target: `node${list[i + 1]}`})
     }
 })
 
@@ -61,18 +70,18 @@ props.nodes.forEach((item: Item) => {
 
 //filter out the myEdges where source is target and target is source from another item
 Array.from(myEdges).forEach((edge: Edge, index: number) => {
-    if(!myEdges.has({source: edge.target, target: edge.source})){
+    if (!myEdges.has({source: edge.target, target: edge.source})) {
         //@ts-ignore
         edges[`edge${index}`] = edge
     }
 })
 
 const eventHandlers: vNG.EventHandlers = {
-    "node:click": ({ node }) => {
+    "node:click": ({node}) => {
         // toggle
         router.get(route('items.show',
-        // @ts-ignore
-        {public_id: nodes[node].public_id}))
+            // @ts-ignore
+            {public_id: nodes[node].public_id}))
     },
 }
 
@@ -118,19 +127,24 @@ const configs = reactive(
                     // * These fields can also be specified with the function as
                     //   `(edges: Record<string, Edge>) => value`.
                     fontSize: 0, // font size.  default: 10
-                    color:  "#4466cc"      // font color. default: "#4466cc"
+                    color: "#4466cc"      // font color. default: "#4466cc"
                 },
-                shape:{
-                  width: 0,
-                  height: 0,
+                shape: {
+                    width: 0,
+                    height: 0,
                 },
-                stroke:{
-                  width: 2,
+                stroke: {
+                    width: 2,
                 }
             }
         },
     })
 )
+
+
+watch(selectedItems.value, (_) => {
+    router.reload();
+})
 </script>
 
 <template>
@@ -138,11 +152,25 @@ const configs = reactive(
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">NodeOverview</h2>
+            <div class="w-full flex flex-row justify-between">
+                <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Item Overview</h2>
+                <selected-item-dropdown :selected-items="selectedItems">
+                    <template #empty>
+                        <p> Narrow the graph down by selecting some items in the item overview!</p>
+                    </template>
+                    <template #button>
+                        <primary-button
+                            class="mt-2 w-fit self-end"
+                            @click="router.get(route('items.index'))">
+                            Select some items!
+                        </primary-button>
+                    </template>
+                </selected-item-dropdown>
+            </div>
         </template>
-        <card>
+        <card class="max-w-6xl mx-auto h-full">
             <v-network-graph
-                class="w-full h-screen"
+                class="w-full h-[70vh]"
                 :nodes="nodes"
                 :edges="edges"
                 :configs="configs"
@@ -156,7 +184,7 @@ const configs = reactive(
                       and specify the relative size (0.0~1.0).
                     -->
                     <clipPath id="faceCircle" clipPathUnits="objectBoundingBox">
-                        <circle cx="0.5" cy="0.5" r="0.5" />
+                        <circle cx="0.5" cy="0.5" r="0.5"/>
                     </clipPath>
                 </defs>
 
@@ -200,6 +228,7 @@ const configs = reactive(
 .face-picture {
     transition: all 0.1s linear;
 }
+
 .face-picture {
     object-fit: cover;
     pointer-events: none;

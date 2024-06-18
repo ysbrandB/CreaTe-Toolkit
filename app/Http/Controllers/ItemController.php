@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AttributeType;
 use App\Models\Item;
+use App\Models\Question;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
@@ -30,7 +31,7 @@ class ItemController extends Controller
             'items' => $builder->get(),
             'attributeTypes' => AttributeType::with('attributes')->orderBy('created_at', 'desc')->get(),
             'initialFilters' => $filters,
-            'questions' => json_decode(File::get(base_path('questions.json'))),
+            'questions' => Question::with('answers.attributes:id')->get(),
         ]);
     }
 

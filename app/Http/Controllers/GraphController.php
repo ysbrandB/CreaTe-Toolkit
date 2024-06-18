@@ -34,7 +34,7 @@ class GraphController extends Controller
             ->whereNotIn('id', $items->pluck('id')->toArray())
             ->get();
 
-        return Inertia::render('Test', [
+        return Inertia::render('Items/Graph', [
             'items' => $items,
             'python' => $pythonItem,
             'nodes' => $nodes,

@@ -16,16 +16,10 @@ import OpeningCard from "@/CustomComponents/OpeningCard.vue";
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Dashboard</h2>
         </template>
 
-        <div class="pt-12">
+        <div class="pt-12 max-w-2xl mx-auto">
             <card>
                 <div class="text-2xl font-bold p-6 text-gray-900 dark:text-gray-100">Sports toolkit</div>
             </card>
         </div>
-
-        <opening-card title="">
-            <template #content>
-                <div class="text-2xl font-bold p-6 text-gray-900 dark:text-gray-100">Sports toolkit</div>
-            </template>
-        </opening-card>
     </AuthenticatedLayout>
 </template>

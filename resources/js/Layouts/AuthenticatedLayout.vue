@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import {ref} from 'vue';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
@@ -10,13 +10,19 @@ import {Link, usePage} from '@inertiajs/vue3';
 const showingNavigationDropdown = ref(false);
 
 const links = [
-    { href: route('dashboard'), active: route().current('dashboard'), text: 'Dashboard' },
-    { href: route('items.index'), active: route().current('items.index'), text: 'Items' },
+    {href: route('dashboard'), active: route().current('dashboard'), text: 'Dashboard'},
+    {href: route('items.index'), active: route().current('items.index'), text: 'Items'},
 ];
-if(usePage().props.auth.user!==null){
-   links.push(
-       { href: route('attribute_types.index'), active: route().current('attribute_types.index'), text: 'Attribute Types' },
-       { href: route('attributes.index'), active: route().current('attributes.index'), text: 'Attributes' })
+if (usePage().props.auth.user !== null) {
+    links.push(
+        {
+            href: route('attribute_types.index'),
+            active: route().current('attribute_types.index'),
+            text: 'Attribute Types'
+        },
+        {href: route('attributes.index'), active: route().current('attributes.index'), text: 'Attributes'},
+        {href: route('questions.index'), active: route().current('questions.index'), text: 'Questions'},
+    )
 }
 </script>
 
@@ -75,7 +81,7 @@ if(usePage().props.auth.user!==null){
                                     </template>
 
                                     <template #content>
-                                        <DropdownLink :href="route('profile.edit')"> Profile </DropdownLink>
+                                        <DropdownLink :href="route('profile.edit')"> Profile</DropdownLink>
                                         <DropdownLink :href="route('logout')" method="post" as="button">
                                             Log Out
                                         </DropdownLink>
@@ -153,7 +159,7 @@ if(usePage().props.auth.user!==null){
                         </div>
 
                         <div class="mt-3 space-y-1">
-                            <ResponsiveNavLink :href="route('profile.edit')"> Profile </ResponsiveNavLink>
+                            <ResponsiveNavLink :href="route('profile.edit')"> Profile</ResponsiveNavLink>
                             <ResponsiveNavLink :href="route('logout')" method="post" as="button">
                                 Log Out
                             </ResponsiveNavLink>
@@ -163,15 +169,15 @@ if(usePage().props.auth.user!==null){
             </nav>
 
             <!-- Page Heading -->
-            <header class="bg-white dark:bg-gray-800 shadow" v-if="$slots.header">
+            <header class="bg-white dark:bg-gray-800 shadow sticky top-0 z-50" v-if="$slots.header">
                 <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                    <slot name="header" />
+                    <slot name="header"/>
                 </div>
             </header>
 
             <!-- Page Content -->
             <main class="h-full">
-                <slot />
+                <slot/>
             </main>
         </div>
     </div>

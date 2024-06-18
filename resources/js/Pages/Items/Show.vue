@@ -92,8 +92,10 @@ const renderMarkdown = (markdown: string | undefined) => marked(markdown ?? '');
                         </template>
                     </OpeningCard>
                 </div>
-                <div class="col-span-3 md:pt-0">
+                <div class="col-span-3">
+                    <div class="sm:mx-auto md:mx-0 md:max-w-full sm:max-w-[50%]">
                     <item-card :item="item"/>
+                    </div>
                 </div>
             </div>
         </section>

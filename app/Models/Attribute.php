@@ -17,9 +17,16 @@ class Attribute extends Model
 
     protected $fillable = ['title', 'description', 'attribute_type_id'];
 
+    protected $hidden = ['pivot', 'created_at', 'updated_at'];
+
     public function items(): BelongsToMany
     {
         return $this->belongsToMany(Item::class);
+    }
+
+    public function answers(): BelongsToMany
+    {
+        return $this->belongsToMany(Answer::class, 'answer_attribute');
     }
 
     public function attributeType(): BelongsTo

@@ -22,10 +22,6 @@ const form = useForm({
     description: props.attributeType?.description ?? '',
     color: props.attributeType?.color ?? '',
 });
-
-function capitalizeFirstLetter(string:string) {
-    return string[0].toUpperCase() + string.slice(1);
-}
 const submit = () => {
     if (props.attributeType) {
         router.put(route('attribute_types.update', props.attributeType.id), form.data());

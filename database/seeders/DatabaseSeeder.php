@@ -2,9 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\Answer;
 use App\Models\Attribute;
 use App\Models\AttributeType;
 use App\Models\Item;
+use App\Models\Question;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -71,6 +73,17 @@ class DatabaseSeeder extends Seeder
         $attributes = Attribute::all();
         foreach ($items as $item) {
             $item->attributes()->attach(
+                $attributes->random(3)
+            );
+        }
+
+        Question::factory(10)->has(
+            Answer::factory()->count(3)
+        )->create();
+
+        $answers = Answer::all();
+        foreach ($answers as $answer) {
+            $answer->attributes()->attach(
                 $attributes->random(3)
             );
         }

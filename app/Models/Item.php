@@ -53,6 +53,8 @@ class Item extends Model
 
     protected $appends = ['public_id', 'photo_url', 'wiring_photo_url'];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     protected $casts = [
         'json_items' => 'json',
     ];

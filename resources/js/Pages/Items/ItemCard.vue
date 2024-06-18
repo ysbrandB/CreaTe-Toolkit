@@ -2,7 +2,6 @@
 import QrcodeVue from "qrcode.vue";
 import Pill from "@/CustomComponents/Pill.vue";
 import {Item} from "@/types";
-import NavLink from "@/Components/NavLink.vue";
 import {Link} from "@inertiajs/vue3";
 
 const props = defineProps<{
@@ -13,14 +12,14 @@ const props = defineProps<{
 <template>
     <div style="container-type: inline-size;">
         <div
-            style="font-size: 4cqw; position:relative; margin-inline: auto; margin-top:1em; padding: 2em; width:23em; background-color: white; color: #1a202c; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); border-radius: 0.5em; aspect-ratio: 63/88; overflow: hidden;">
+            style="font-size: 4cqw; position:relative; margin-inline: auto; padding: 2em; width:23em; background-color: white; color: #1a202c; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); border-radius: 0.5em; aspect-ratio: 63/88; overflow: hidden;">
             <Link :href="route('items.show',{public_id: item.public_id})">
                 <div
                     style="overflow: hidden; text-wrap: nowrap; text-overflow: ellipsis; font-weight: bold; max-height:1.5em; max-width: 100%; font-size: 2em; margin-bottom: 0.3em;">
                     {{ item.title }}
                 </div>
                 <img :src="item.photo_url"
-                     style="border-radius: 0.5em; height:11em; max-height: 11em; max-width: 15em; display: block; margin: 0 auto; object-fit: contain;object-position: center; "
+                     style="border-radius: 0.5em; height:11em; max-height: 11em; max-width: 15em; display: block; margin: 0 auto;"
                      alt="item photo">
             </Link>
             <div style="display: flex; flex-direction: column; height:13.2em; margin-top: .3em; gap:.3em">

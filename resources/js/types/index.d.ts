@@ -28,7 +28,7 @@ export interface Attribute {
     title: string;
     description: string;
     attribute_type_id: number;
-    attribute_type?: AttributeType;
+    attribute_type: AttributeType;
 }
 
 export interface AttributeType {
@@ -37,6 +37,18 @@ export interface AttributeType {
     description: string;
     color: string;
     attributes?: Attribute[];
+}
+
+interface Question {
+    id: number,
+    title: string,
+    description: string,
+    answers?: Answer[]
+}
+interface Answer {
+    id?: number,
+    text: string,
+    attributes: Attribute[]
 }
 
 export type PageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & {

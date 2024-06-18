@@ -74,11 +74,11 @@ const submit = () => {
 </script>
 
 <template>
+    <Head title="Update item"/>
     <AuthenticatedLayout>
         <form @submit.prevent="submit" class="m-4">
             <div class="flex lg:flex-row flex-col">
                 <Card>
-                    <Head title="Update item"/>
                     <div>
                         <InputLabel for="title" value="Title"/>
                         <TextInput
@@ -103,7 +103,7 @@ const submit = () => {
                         >
                     </div>
 
-                    <div class="w-96 mt-4">
+                    <div class="mt-4">
                         <MarkDownTextArea
                             id="description"
                             @updateMarkdown="form.description = $event"
@@ -111,7 +111,7 @@ const submit = () => {
                             :error="form.errors.description??''"/>
                     </div>
 
-                    <div class="w-96 mt-4">
+                    <div class="mt-4">
                         <MarkDownTextArea
                             id="card_description"
                             @updateMarkdown="form.card_description = $event"
@@ -119,7 +119,7 @@ const submit = () => {
                             :error="form.errors.card_description??''"/>
                     </div>
 
-                    <div class="w-96 mt-4">
+                    <div class="mt-4">
                         <MarkDownTextArea
                             id="wiring_instructions"
                             @updateMarkdown="form.wiring_instructions = $event"
@@ -138,7 +138,7 @@ const submit = () => {
                         >
                     </div>
 
-                    <div class="w-96 mt-4">
+                    <div class="mt-4">
                         <MarkDownTextArea
                             id="pros"
                             @updateMarkdown="form.pros = $event"
@@ -146,7 +146,7 @@ const submit = () => {
                             :error="form.errors.pros??''"/>
                     </div>
 
-                    <div class="w-96 mt-4">
+                    <div class="mt-4">
                         <MarkDownTextArea
                             id="cons"
                             @updateMarkdown="form.cons = $event"
@@ -154,7 +154,7 @@ const submit = () => {
                             :error="form.errors.cons??''"/>
                     </div>
 
-                    <div class="w-96 mt-4">
+                    <div class="mt-4">
                         <MarkDownTextArea
                             id="hardware_considerations"
                             @updateMarkdown="form.hardware_considerations = $event"
@@ -162,7 +162,7 @@ const submit = () => {
                             :error="form.errors.hardware_considerations??''"/>
                     </div>
 
-                    <div class="w-96 mt-4">
+                    <div class="mt-4">
                         <MarkDownTextArea
                             id="software_considerations"
                             @updateMarkdown="form.software_considerations = $event"
@@ -170,7 +170,7 @@ const submit = () => {
                             :error="form.errors.software_considerations??''"/>
                     </div>
 
-                    <div class="w-96 mt-4">
+                    <div class="mt-4">
                         <MarkDownTextArea
                             id="example_code"
                             @updateMarkdown="form.example_code = $event"
@@ -179,7 +179,7 @@ const submit = () => {
                     </div>
                 </Card>
                 <card>
-                    <div class="w-96 mt-4 text-center">
+                    <div class="mt-4 text-center">
                         <attribute-filter
                             title="attributes"
                             :attribute-types="props.attributeTypes"
@@ -190,7 +190,7 @@ const submit = () => {
                     </div>
                 </card>
                 <card>
-                    <div class="w-96 mt-4 text-center">
+                    <div class="mt-4 text-center">
                         <div class="text-md">This item</div>
                         <div v-for="(selectedItemId, index) in form.edges" :key="index">
                             <div class="text-lg font-bold">↓</div>
