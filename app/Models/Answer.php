@@ -10,7 +10,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Answer extends Model
 {
     use HasFactory;
+
     protected $hidden = ['created_at', 'updated_at'];
+
     protected $fillable = [
         'text',
     ];
