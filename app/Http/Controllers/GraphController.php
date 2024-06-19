@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Item;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
 
 class GraphController extends Controller
@@ -18,26 +17,26 @@ class GraphController extends Controller
             ->where('id', env('PYTHON_ID'))
             ->firstOrFail();
         $items = $query->clone();
-        $selected = Session::get('selected');
-        if ($selected) {
+        if ($selected = $request->session()->get('selected')) {
             $items = $items
                 ->whereIn('id', $selected)
-                ->whereNot('id', env('PYTHON_ID'))
-                ->get();
+                ->whereNot('id', env('PYTHON_ID'));
         } else {
-            $items = $items->whereNot('id', env('PYTHON_ID'))
-                ->get();
+            $items = $items->whereNot('id', env('PYTHON_ID'));
         }
 
         $nodes = $query->clone()
-            ->whereIn('id', $items->pluck('json_items')->flatten()->unique())
-            ->whereNotIn('id', $items->pluck('id')->toArray())
-            ->get();
+            ->whereIn('id',collect($items->pluck('json_items')->flatten())
+                ->merge($items->pluck('id'))
+                ->merge($pythonItem->id)
+                ->unique()
+                ->values()->toArray());
 
         return Inertia::render('Items/Graph', [
-            'items' => $items,
-            'python' => $pythonItem,
-            'nodes' => $nodes,
+            'items' => $items->get(),
+            'nodes' => $nodes->get(),
+            'python' => fn () => $pythonItem,
+            'initialSelectedItems' => fn () => Item::whereIn('id', $request->session()->get('selected') ?? [])->get(),
         ]);
     }
 

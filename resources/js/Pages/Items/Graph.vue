@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import {Head, router} from '@inertiajs/vue3';
+import {Head, router, usePage} from '@inertiajs/vue3';
 import {Configs, Edges, VNetworkGraph} from "v-network-graph"
 import "v-network-graph/lib/style.css"
 import 'd3-force';
-import {reactive, ref, watch} from "vue"
+import {onMounted, reactive, ref, watch} from "vue"
 import * as vNG from "v-network-graph"
 import {
     ForceLayout,
@@ -12,16 +12,10 @@ import {
     ForceEdgeDatum,
 } from "v-network-graph/lib/force-layout"
 import Card from "@/Components/Card.vue";
-import {Item} from "@/types";
+import {Item, PageProps} from "@/types";
 import SelectedItemDropdown from "@/CustomComponents/SelectedItemDropdown.vue";
-import axios from "axios";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-
-interface Node extends vNG.Node {
-    size?: number
-    color?: string
-    label?: boolean
-}
+import axios from "axios";
 
 interface Edge extends vNG.Edge {
     width?: number
@@ -33,55 +27,51 @@ const props = defineProps<{
     items: Item[],
     nodes: Item[]
     python: Item,
-    initialSelectedItems?: Item[],
+    initialSelectedItems: Item[]
 }>();
 
-const selectedItems = ref(new Set<Item>(props.initialSelectedItems ?? []));
-const myEdges: Set<Edge> = new Set<Edge>();
-const nodes = reactive({})
-const edges = reactive({})
-if (props.python) {
-    //@ts-ignore
-    nodes[`node${props.python.id}`] = {
-        name: props.python.title,
-        photo_url: props.python.photo_url,
-        public_id: props.python.public_id
-    }
+const page = usePage();
+const nodes = ref({})
+const edges = ref({})
+const calculate = (pageProps: any) =>{
+    const myEdges: Set<Edge> = new Set<Edge>();
+    nodes.value = {};
+    edges.value = {};
+
+    (pageProps.props as typeof props).nodes.forEach((node: Item) => {
+        //@ts-ignore
+        nodes.value[`node${node.id}`] = {
+            name: node.title,
+            photo_url: node.photo_url,
+            public_id: node.public_id
+        }
+    });
+
+    (pageProps.props as typeof props).items.forEach((item: Item) => {
+        const list = [item.id, ...item.json_items ?? [], props.python.id]
+        for (let i = 0; i < list.length - 1; i++) {
+            //@ts-ignore
+            myEdges.add({source: `node${list[i]}`, target: `node${list[i + 1]}`})
+        }
+    });
+
+    //filter out the myEdges where source is target and target is source from another item
+    Array.from(myEdges).forEach((edge: Edge, index: number) => {
+        if (!myEdges.has({source: edge.target, target: edge.source})) {
+            //@ts-ignore
+            edges.value[`edge${index}`] = edge
+        }
+    });
 }
 
-const addNode = (item: Item) => {
-    const node: Node = {name: item.title, photo_url: item.photo_url, public_id: item.public_id};
-    //@ts-ignore
-    nodes[`node${item.id}`] = node;
-}
-
-props.items.forEach((item: Item) => {
-    addNode(item)
-    const list = [item.id, ...item.json_items ?? [], props.python.id]
-    for (let i = 0; i < list.length - 1; i++) {
-        //@ts-ignore
-        myEdges.add({source: `node${list[i]}`, target: `node${list[i + 1]}`})
-    }
-})
-
-props.nodes.forEach((item: Item) => {
-    addNode(item)
-})
-
-//filter out the myEdges where source is target and target is source from another item
-Array.from(myEdges).forEach((edge: Edge, index: number) => {
-    if (!myEdges.has({source: edge.target, target: edge.source})) {
-        //@ts-ignore
-        edges[`edge${index}`] = edge
-    }
-})
+calculate(page);
 
 const eventHandlers: vNG.EventHandlers = {
     "node:click": ({node}) => {
         // toggle
         router.get(route('items.show',
             // @ts-ignore
-            {public_id: nodes[node].public_id}))
+            {public_id: nodes.value[node].public_id}))
     },
 }
 
@@ -121,7 +111,7 @@ const configs = reactive(
             },
         },
         edge: {
-            summarize: ((edges: Edges, configs: Configs) => true),
+            summarize: ((edges: Edges, configs: Configs) => false),
             summarized: { // configs for summarized edge
                 label: {
                     // * These fields can also be specified with the function as
@@ -141,10 +131,21 @@ const configs = reactive(
     })
 )
 
-
-watch(selectedItems.value, (_) => {
-    router.reload();
-})
+const selectedItems = ref(new Set<Item>(props.initialSelectedItems ?? []))
+onMounted(() => {
+    watch(selectedItems.value, (selected) => {
+        axios.post(route('graph.syncSelected'), {
+            selected: Array.from(selected).map((item: Item) => item.id)
+        }).then(()=>{
+            router.reload({
+                only: ['items', 'nodes', 'initialSelectedItems'],
+                onSuccess: (e) => {
+                    calculate(e);
+                }
+            })
+        })
+    })
+});
 </script>
 
 <template>
@@ -162,12 +163,13 @@ watch(selectedItems.value, (_) => {
                         <primary-button
                             class="mt-2 w-fit self-end"
                             @click="router.get(route('items.index'))">
-                            Select some items!
+                            Select some {{selectedItems.size<0?'more':''}} items!
                         </primary-button>
                     </template>
                 </selected-item-dropdown>
             </div>
         </template>
+
         <card class="max-w-6xl mx-auto h-full">
             <v-network-graph
                 class="w-full h-[70vh]"
@@ -177,12 +179,6 @@ watch(selectedItems.value, (_) => {
                 :event-handlers="eventHandlers"
             >
                 <defs>
-                    <!--
-                      Define the path for clipping the face image.
-                      To change the size of the applied node as it changes,
-                      add the `clipPathUnits="objectBoundingBox"` attribute
-                      and specify the relative size (0.0~1.0).
-                    -->
                     <clipPath id="faceCircle" clipPathUnits="objectBoundingBox">
                         <circle cx="0.5" cy="0.5" r="0.5"/>
                     </clipPath>

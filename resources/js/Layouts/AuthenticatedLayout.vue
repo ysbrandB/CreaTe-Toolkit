@@ -10,8 +10,8 @@ import {Link, usePage} from '@inertiajs/vue3';
 const showingNavigationDropdown = ref(false);
 
 const links = [
-    {href: route('dashboard'), active: route().current('dashboard'), text: 'Dashboard'},
     {href: route('items.index'), active: route().current('items.index'), text: 'Items'},
+    {href: route('graph.index'), active: route().current('graph.index'), text: 'Item Graph'},
 ];
 if (usePage().props.auth.user !== null) {
     links.push(
@@ -22,6 +22,7 @@ if (usePage().props.auth.user !== null) {
         },
         {href: route('attributes.index'), active: route().current('attributes.index'), text: 'Attributes'},
         {href: route('questions.index'), active: route().current('questions.index'), text: 'Questions'},
+        {href: route('dashboard'), active: route().current('dashboard'), text: 'Dashboard'},
     )
 }
 </script>
@@ -169,7 +170,9 @@ if (usePage().props.auth.user !== null) {
             </nav>
 
             <!-- Page Heading -->
-            <header class="bg-white dark:bg-gray-800 shadow sticky top-0 z-50" v-if="$slots.header">
+            <header
+                :class="[route().current('items.show') ? '' : 'sticky']"
+                class="bg-white dark:bg-gray-800 shadow top-0 z-10" v-if="$slots.header">
                 <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                     <slot name="header"/>
                 </div>

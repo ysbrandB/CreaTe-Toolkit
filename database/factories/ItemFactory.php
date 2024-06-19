@@ -22,7 +22,6 @@ class ItemFactory extends Factory
             'description' => $this->faker->paragraph,
             'card_description' => $this->faker->text,
             'photo' => 'markus-spiske-QozzJpFZ2lg-unsplash.jpg',
-            'is_actuator' => $this->faker->boolean,
             'pros' => $this->faker->paragraph,
             'cons' => $this->faker->paragraph,
             'hardware_considerations' => $this->faker->paragraph,

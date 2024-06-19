@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import NavLink from "@/Components/NavLink.vue";
-import {router} from "@inertiajs/vue3";
+import {router, usePage} from "@inertiajs/vue3";
 import {AttributeType, Item, Question} from "@/types";
 import Card from "@/Components/Card.vue";
 import AttributeFilter from "@/CustomComponents/AttributeFilter.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import {computed, Ref, ref, watch} from "vue";
+import {computed, onMounted, Ref, ref, watch} from "vue";
 import axios from "axios";
 import ItemCard from "@/Pages/Items/ItemCard.vue";
 import Modal from "@/Components/Modal.vue";
@@ -15,12 +15,13 @@ import SelectedItemDropdown from "@/CustomComponents/SelectedItemDropdown.vue";
 
 const props = defineProps<{
     items: Item[],
-    initialSelectedItems?: Item[],
     attributeTypes: AttributeType[],
     initialFilters: Record<number, number[]>,
     questions: Question[],
+    initialSelectedItems: Item[],
+    explainer: boolean,
 }>();
-
+const page = usePage();
 const selectedItems = ref(new Set<Item>(props.initialSelectedItems ?? []));
 const reloadWithFilters = (filters: Record<number, number[]>) => {
     router.reload({
@@ -31,11 +32,14 @@ const reloadWithFilters = (filters: Record<number, number[]>) => {
     })
 };
 
-watch(selectedItems.value, (selected) => {
-    axios.post(route('graph.syncSelected'), {
-        selected: Array.from(selected).map((item: Item) => item.id)
-    });
-})
+onMounted(() => {
+    watch(selectedItems.value, (selected) => {
+        axios.post(route('graph.syncSelected'), {
+            selected: Array.from(selected).map((item: Item) => item.id)
+        });
+    })
+});
+
 
 const resetChoice = () => {
     choiceOpen.value = false;
@@ -53,6 +57,7 @@ const questionAnswered = (filters: number[]) => {
 
 const choiceOpen = ref(false);
 const choiceIndex = ref(0);
+const explainOpen = ref(props.explainer);
 const question = computed(() => props.questions[choiceIndex.value]);
 const filter: Ref<typeof AttributeFilter | null> = ref(null);
 
@@ -69,11 +74,14 @@ const filter: Ref<typeof AttributeFilter | null> = ref(null);
                             New item
                         </NavLink>
                     </div>
-                    <secondary-button class="bg-green-100"
-                                      @click="resetChoice(); filter?.reset(); choiceOpen=true">
-                        Choice helper
+                    <secondary-button @click="explainOpen=true">
+                        Explainer
                     </secondary-button>
-                    <selected-item-dropdown :selected-items="selectedItems"/>
+                    <primary-button
+                        @click="resetChoice(); filter?.reset(); choiceOpen=true">
+                        Choice helper
+                    </primary-button>
+                    <selected-item-dropdown class="mx-2" :selected-items="selectedItems"/>
                 </div>
             </div>
         </template>
@@ -101,7 +109,7 @@ const filter: Ref<typeof AttributeFilter | null> = ref(null);
                                     -
                                 </button>
                                 <button v-else @click="selectedItems.add(item)"
-                                        class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-500 font-semibold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-widest shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-25 transition ease-in-out duration-150"
+                                        class="bg-grey-100 dark:bg-gray-800 border border-grey-300 dark:border-gray-500 font-semibold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-widest shadow-sm hover:bg-emerald-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-25 transition ease-in-out duration-150"
                                         style="border-radius:.5em;font-size: 1.1em; width:3.5em; height:3em; align-self: flex-end;">
                                     +
                                 </button>
@@ -112,7 +120,7 @@ const filter: Ref<typeof AttributeFilter | null> = ref(null);
             </div>
         </section>
         <modal :show="choiceOpen" @close="resetChoice">
-            <div class="w-full bg-blue-100 p-8">
+            <div class="w-full bg-emerald-100 p-8">
                 <div class="text-black text-2xl font-bold">Choice helper</div>
                 <div class="text-gray-900 text-lg mt-1">
                     Answer the questions to see which items fit your needs!
@@ -125,6 +133,49 @@ const filter: Ref<typeof AttributeFilter | null> = ref(null);
                         </primary-button>
                     </div>
                 </card>
+            </div>
+        </modal>
+
+        <modal :show="explainOpen" @close="explainOpen=false">
+            <div class="w-full bg-blue-100 p-8">
+                <div class="text-black text-2xl font-bold">Choice helper</div>
+                <div class="text-gray-900 text-lg mt-1">
+                    This tool helps you find the right sensors and actuators for your project!
+                </div>
+                <card class="mt-4">
+                    <div class="font-bold text-lg text-gray-900 dark:text-gray-100">
+                        What to do?
+                    </div>
+                    <div class="text-gray-800 dark:text-gray-200">
+                        You can add items to your selection by clicking on the plus button. <br>
+                        You can see your selected items in the top right!<br><br>
+                    </div>
+
+                    <div class="font-bold text-lg text-gray-900 dark:text-gray-100">
+                        Which items to choose?
+                    </div>
+                    <div class="text-gray-800 dark:text-gray-200">
+                        If you are unsure which items to choose, you can use the choice helper to answer a few questions
+                        and narrow down the selection.
+                        You can also always find this at the top of this page!<br> <br>
+                    </div>
+
+                    <div class="font-bold text-lg text-gray-900 dark:text-gray-100">
+                        Then what?
+                    </div>
+                    <div class="text-gray-800 dark:text-gray-200">
+                        When you are done, see how your selected items can be put together by clicking on the "SEE ITEM
+                        GRAPH" button.
+                    </div>
+                </card>
+                <div class="w-full flex justify-between gap-4 mt-6">
+                    <primary-button @click="choiceOpen=true; explainOpen=false">
+                        Use the choice helper
+                    </primary-button>
+                    <secondary-button @click="explainOpen=false">
+                        I want to explore on my own
+                    </secondary-button>
+                </div>
             </div>
         </modal>
     </AuthenticatedLayout>

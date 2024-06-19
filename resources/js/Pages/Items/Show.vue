@@ -2,7 +2,8 @@
 import {Item} from "@/types";
 
 const props = defineProps<{
-    item: Item
+    item: Item,
+    initialSelectedItems: Item[],
 }>();
 
 import OpeningCard from "@/CustomComponents/OpeningCard.vue";
@@ -20,9 +21,22 @@ import 'highlight.js/styles/atom-one-dark.css';
 
 import {marked} from 'marked';
 import ItemCard from "@/Pages/Items/ItemCard.vue";
+import SelectedItemDropdown from "@/CustomComponents/SelectedItemDropdown.vue";
+import {router, usePage} from "@inertiajs/vue3";
+import {onMounted, ref, watch} from "vue";
+import axios from "axios";
 
 const renderMarkdown = (markdown: string | undefined) => marked(markdown ?? '');
 
+const page = usePage();
+const selectedItems = ref(new Set<Item>(props.initialSelectedItems ?? []));
+onMounted(() => {
+    watch(selectedItems.value, (selected) => {
+        axios.post(route('graph.syncSelected'), {
+            selected: Array.from(selected).map((item: Item) => item.id)
+        });
+    })
+});
 </script>
 
 <template>
@@ -41,6 +55,7 @@ const renderMarkdown = (markdown: string | undefined) => marked(markdown ?? '');
                         Delete item {{ item.id }}
                     </NavLink>
                 </div>
+                <selected-item-dropdown :selected-items="selectedItems"/>
             </div>
         </template>
         <section class="w-full h-full mx-auto">
@@ -93,7 +108,7 @@ const renderMarkdown = (markdown: string | undefined) => marked(markdown ?? '');
                     </OpeningCard>
                 </div>
                 <div class="col-span-3">
-                    <div class="sm:mx-auto md:mx-0 md:max-w-full sm:max-w-[50%]">
+                    <div class="sticky top-[18px] mt-4 sm:mx-auto md:mx-0 md:max-w-full sm:max-w-[50%]">
                     <item-card :item="item"/>
                     </div>
                 </div>

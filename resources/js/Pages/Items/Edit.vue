@@ -52,7 +52,6 @@ const form = useForm({
 
 function handlePhotoChange(e: any) {
     form.photo = e.target.files[0]
-    console.log(form.photo)
 }
 
 function handleWiringPhotoChange(e: any) {

@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\AttributeType;
 use App\Models\Item;
 use App\Models\Question;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Vinkla\Hashids\Facades\Hashids;
@@ -25,12 +28,15 @@ class ItemController extends Controller
             });
         }
 
+        Session::put('explainer', Carbon::now()->addMinutes(30)->timestamp);
+
         return Inertia::render('Items/Index', [
-            'initialSelectedItems' => Item::whereIn('id', $request->session()->get('selected') ?? [])->get(),
             'items' => $builder->get(),
             'attributeTypes' => AttributeType::with('attributes')->orderBy('created_at', 'desc')->get(),
             'initialFilters' => $filters,
             'questions' => Question::with('answers.attributes:id')->get(),
+            'initialSelectedItems' => Item::whereIn('id', $request->session()->get('selected') ?? [])->get(),
+            'explainer' => Carbon::now()->timestamp>=Session::get('explainer') ?? 0,
         ]);
     }
 
@@ -80,6 +86,7 @@ class ItemController extends Controller
 
         return Inertia::render('Items/Show', [
             'item' => $item,
+            'initialSelectedItems' => Item::whereIn('id', Session::get('selected') ?? [])->get(),
         ]);
     }
 

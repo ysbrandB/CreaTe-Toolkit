@@ -14,7 +14,6 @@ use Vinkla\Hashids\Facades\Hashids;
  * @property string description
  * @property string card_description
  * @property string public_id
- * @property bool is_actuator
  * @property string photo
  * @property string pros
  * @property string cons
