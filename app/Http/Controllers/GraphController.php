@@ -26,7 +26,7 @@ class GraphController extends Controller
         }
 
         $nodes = $query->clone()
-            ->whereIn('id',collect($items->pluck('json_items')->flatten())
+            ->whereIn('id', collect($items->pluck('json_items')->flatten())
                 ->merge($items->pluck('id'))
                 ->merge($pythonItem->id)
                 ->unique()
@@ -35,8 +35,8 @@ class GraphController extends Controller
         return Inertia::render('Items/Graph', [
             'items' => $items->get(),
             'nodes' => $nodes->get(),
-            'python' => fn () => $pythonItem,
-            'initialSelectedItems' => fn () => Item::whereIn('id', $request->session()->get('selected') ?? [])->get(),
+            'python' => static fn () => $pythonItem,
+            'initialSelectedItems' => static fn () => Item::whereIn('id', $request->session()->get('selected') ?? [])->get(),
         ]);
     }
 

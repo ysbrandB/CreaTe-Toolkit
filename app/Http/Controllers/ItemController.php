@@ -7,7 +7,6 @@ use App\Models\Item;
 use App\Models\Question;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -36,7 +35,7 @@ class ItemController extends Controller
             'initialFilters' => $filters,
             'questions' => Question::with('answers.attributes:id')->get(),
             'initialSelectedItems' => Item::whereIn('id', $request->session()->get('selected') ?? [])->get(),
-            'explainer' => Carbon::now()->timestamp>=Session::get('explainer') ?? 0,
+            'explainer' => Carbon::now()->timestamp >= Session::get('explainer') ?? 0,
         ]);
     }
 
