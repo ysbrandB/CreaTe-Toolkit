@@ -147,8 +147,10 @@ const filter: Ref<typeof AttributeFilter | null> = ref(null);
                         What to do?
                     </div>
                     <div class="text-gray-800 dark:text-gray-200">
-                        You can add items to your selection by clicking on the plus button. <br>
-                        You can see your selected items in the top right!<br><br>
+                        You can add items to your selection by clicking on the plus button.<br>
+                        You can see your selected items in the top right!
+                        Click on an item card to learn more about it.
+                        <br><br>
                     </div>
 
                     <div class="font-bold text-lg text-gray-900 dark:text-gray-100">
@@ -157,14 +159,14 @@ const filter: Ref<typeof AttributeFilter | null> = ref(null);
                     <div class="text-gray-800 dark:text-gray-200">
                         If you are unsure which items to choose, you can use the choice helper to answer a few questions
                         and narrow down the selection.
-                        You can also always find this at the top of this page!<br> <br>
+                        You can also always find it with the button at the top of this page!<br> <br>
                     </div>
 
                     <div class="font-bold text-lg text-gray-900 dark:text-gray-100">
                         Then what?
                     </div>
                     <div class="text-gray-800 dark:text-gray-200">
-                        When you are done, see how your selected items can be put together by clicking on the "SEE ITEM
+                        When you are done, see how your selected items can be put together by clicking on the "ITEM
                         GRAPH" button.
                     </div>
                 </card>

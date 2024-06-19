@@ -111,7 +111,7 @@ const configs = reactive(
             },
         },
         edge: {
-            summarize: ((edges: Edges, configs: Configs) => false),
+            summarize: ((edges: Edges, configs: Configs) => true),
             summarized: { // configs for summarized edge
                 label: {
                     // * These fields can also be specified with the function as
