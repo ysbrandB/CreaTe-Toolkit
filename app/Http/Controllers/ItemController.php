@@ -26,12 +26,14 @@ class ItemController extends Controller
                 $query->where('attribute_type_id', $attributeCategoryId)->whereIn('attributes.id', $attributeIds);
             });
         }
+
         $showInitialExplainer = true;
-        if(Session::get('explainer') && Carbon::now()->timestamp <= Session::get('explainer')){
+        if (Session::get('explainer') && Carbon::now()->timestamp <= Session::get('explainer')) {
             $showInitialExplainer = false;
-        }else{
+        } else {
             Session::put('explainer', Carbon::now()->addMinutes(30)->timestamp);
         }
+
         return Inertia::render('Items/Index', [
             'items' => $builder->get(),
             'attributeTypes' => AttributeType::with('attributes')->orderBy('created_at', 'desc')->get(),

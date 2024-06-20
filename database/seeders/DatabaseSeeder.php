@@ -87,9 +87,6 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-
-
-
         Attribute::create(
             [
                 'attribute_type_id' => $processors->id,
