@@ -26,16 +26,19 @@ class ItemController extends Controller
                 $query->where('attribute_type_id', $attributeCategoryId)->whereIn('attributes.id', $attributeIds);
             });
         }
-
-        Session::put('explainer', Carbon::now()->addMinutes(30)->timestamp);
-
+        $showInitialExplainer = true;
+        if(Session::get('explainer') && Carbon::now()->timestamp <= Session::get('explainer')){
+            $showInitialExplainer = false;
+        }else{
+            Session::put('explainer', Carbon::now()->addMinutes(30)->timestamp);
+        }
         return Inertia::render('Items/Index', [
             'items' => $builder->get(),
             'attributeTypes' => AttributeType::with('attributes')->orderBy('created_at', 'desc')->get(),
             'initialFilters' => $filters,
             'questions' => Question::with('answers.attributes:id')->get(),
             'initialSelectedItems' => Item::whereIn('id', $request->session()->get('selected') ?? [])->get(),
-            'explainer' => Carbon::now()->timestamp >= Session::get('explainer') ?? 0,
+            'explainer' => $showInitialExplainer,
         ]);
     }
 

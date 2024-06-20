@@ -90,7 +90,7 @@ const submit = () => {
                     class="inline-flex h-full items-center w-min text-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-500 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150"
                 > Delete Attribute </Link>
                 <PrimaryButton class="ms-4 w-min" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                    Update AttributeType
+                    Update attribute
                 </PrimaryButton>
             </div>
         </form>

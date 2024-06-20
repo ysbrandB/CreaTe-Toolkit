@@ -93,7 +93,7 @@ onMounted(() => {
 
                     <OpeningCard title="Wiring" v-if="item.wiring_instructions">
                         <template #content>
-                            <div class="float-right mb-2 text-black italic dark:text-gray-100">
+                            <div class="float-right mb-2 text-black italic dark:text-gray-100" v-if="item.wiring_photo_url">
                                 <img :src="item.wiring_photo_url" width="400" class="rounded-lg" alt="wiring diagram">
                                 Wiring diagram
                             </div>

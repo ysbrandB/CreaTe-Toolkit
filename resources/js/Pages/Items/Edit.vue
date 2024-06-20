@@ -4,12 +4,10 @@ import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import {Head, router, useForm} from '@inertiajs/vue3';
-import {computed, ref} from "vue";
-import axios from "axios";
 import MarkDownTextArea from "@/CustomComponents/MarkDownTextArea.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Card from "@/Components/Card.vue";
-import {Attribute, AttributeType, Item} from "@/types";
+import {AttributeType, Item} from "@/types";
 import AttributeFilter from "@/CustomComponents/AttributeFilter.vue";
 
 const props = defineProps<{
@@ -18,7 +16,13 @@ const props = defineProps<{
     items: Item[],
     myAttributes: any
 }>();
-const addSelectedItem = (item: number, idx: number) => {
+
+const addSelectedItem = (item: string, idx: number) => {
+    if(item === "-1") {
+        // @ts-ignore
+        form.edges.splice(idx, 1);
+        return;
+    }
     // @ts-ignore
     form.edges[idx] = item;
 }
@@ -38,9 +42,9 @@ const form = useForm({
     title: props.item?.title ?? '',
     description: props.item?.description ?? '',
     card_description: props.item?.card_description ?? '',
-    wiring_instructions:  props.item?.wiring_instructions ?? '',
+    wiring_instructions: props.item?.wiring_instructions ?? '',
     pros: props.item?.pros ?? '',
-    cons:   props.item?.cons ?? '',
+    cons: props.item?.cons ?? '',
     hardware_considerations: props.item?.hardware_considerations ?? '',
     software_considerations: props.item?.software_considerations ?? '',
     example_code: props.item?.example_code ?? '',
@@ -65,7 +69,7 @@ const submit = () => {
             forceFormData: true,
         });
     } else {
-        router.post(route('items.store'), form.data(),{
+        router.post(route('items.store'), form.data(), {
             forceFormData: true,
         });
     }
@@ -200,10 +204,11 @@ const submit = () => {
                                     // @ts-ignore
                                     $event.target.value, index)"
                             >
-                                <option v-for="selectableItem in props.items"
+                                <option value="-1">Remove block</option>
+                                <option v-for="selectableItem in items"
                                         :value="selectableItem.id"
                                         :key="selectableItem.id"
-                                        :selected="selectedItemId === selectableItem.id">
+                                        :selected="selectableItem.id.toString()===selectedItemId">
                                     {{ selectableItem.title }}
                                 </option>
                             </select>

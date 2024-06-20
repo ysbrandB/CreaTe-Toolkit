@@ -163,7 +163,7 @@ onMounted(() => {
                         <primary-button
                             class="mt-2 w-fit self-end"
                             @click="router.get(route('items.index'))">
-                            Select some {{selectedItems.size<0?'more':''}} items!
+                            Select {{selectedItems.size<0?'some':'more'}} items!
                         </primary-button>
                     </template>
                 </selected-item-dropdown>

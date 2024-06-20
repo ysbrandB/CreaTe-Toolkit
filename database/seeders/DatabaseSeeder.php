@@ -39,6 +39,57 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        $types = AttributeType::create(
+            [
+                'title' => 'Type',
+                'description' => 'The type an item can be',
+                'color' => 'red',
+            ]
+        );
+
+        Attribute::create(
+            [
+                'attribute_type_id' => $types->id,
+                'title' => 'Sensor',
+                'description' => 'A sensor is a device that detects events or changes in quantities and provides a corresponding output, generally as an electrical or optical signal',
+            ]
+        );
+
+        Attribute::create(
+            [
+                'attribute_type_id' => $types->id,
+                'title' => 'Actuator',
+                'description' => 'An actuator is a component of a machine that is responsible for moving and controlling a mechanism or system',
+            ]
+        );
+
+        Attribute::create(
+            [
+                'attribute_type_id' => $types->id,
+                'title' => 'Programming Language',
+                'description' => 'A programming language is a formal language comprising a set of instructions that produce various kinds of output',
+            ]
+        );
+
+        Attribute::create(
+            [
+                'attribute_type_id' => $types->id,
+                'title' => 'Development Board',
+                'description' => 'A development board is a printed circuit board containing a microprocessor and the minimal support logic needed for a computer engineer to become a user of a microprocessor',
+            ]
+        );
+
+        Attribute::create(
+            [
+                'attribute_type_id' => $types->id,
+                'title' => 'Supporting technologies',
+                'description' => 'All the items that are used to make the actuators and sensors work together',
+            ]
+        );
+
+
+
+
         Attribute::create(
             [
                 'attribute_type_id' => $processors->id,
@@ -59,9 +110,13 @@ class DatabaseSeeder extends Seeder
             Attribute::factory()->count(5)
         )->create();
 
-        Item::factory()->create([
+        $python = Item::factory()->create([
             'title' => 'Python',
         ]);
+
+        $python->attributes()->attach(
+            Attribute::where('title', 'Programming Language')->first()
+        );
 
         $items = Item::factory(10)->create();
         for ($i = 2; $i < 11 - 3; $i += 3) {
@@ -70,17 +125,16 @@ class DatabaseSeeder extends Seeder
             $item->save();
         }
 
-        $attributes = Attribute::all();
         foreach ($items as $item) {
             $item->attributes()->attach(
-                $attributes->random(3)
+                Attribute::all()->random(3)
             );
         }
 
-        Question::factory(10)->has(
+        Question::factory(5)->has(
             Answer::factory()->count(3)
         )->create();
-
+        $attributes = Attribute::all();
         $answers = Answer::all();
         foreach ($answers as $answer) {
             $answer->attributes()->attach(

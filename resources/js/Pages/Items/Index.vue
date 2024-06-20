@@ -12,11 +12,13 @@ import ItemCard from "@/Pages/Items/ItemCard.vue";
 import Modal from "@/Components/Modal.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import SelectedItemDropdown from "@/CustomComponents/SelectedItemDropdown.vue";
+import breakpoints, {Breakpoints} from '../../CustomComponents/TailwindWidth'
+
 
 const props = defineProps<{
     items: Item[],
     attributeTypes: AttributeType[],
-    initialFilters: Record<number, number[]>,
+    initialFilters: Record<number, string[]>,
     questions: Question[],
     initialSelectedItems: Item[],
     explainer: boolean,
@@ -125,12 +127,17 @@ const filter: Ref<typeof AttributeFilter | null> = ref(null);
                 <div class="text-gray-900 text-lg mt-1">
                     Answer the questions to see which items fit your needs!
                 </div>
-                <card class="mt-4">
+                <card class="mt-4" v-if="question">
                     <div class="text-gray-800 dark:text-gray-200 leading-tight">{{ question.description }}</div>
                     <div class="w-full mt-2 mx-auto" v-for="answer in question.answers">
                         <primary-button @click="questionAnswered(answer.attributes.map(attr=>attr.id))">
                             {{ answer.text }}
                         </primary-button>
+                    </div>
+                </card>
+                <card v-else>
+                    <div class="text-gray-800 dark:text-gray-200 leading-tight">
+                        There currently are no questions available.
                     </div>
                 </card>
             </div>
@@ -171,12 +178,12 @@ const filter: Ref<typeof AttributeFilter | null> = ref(null);
                     </div>
                 </card>
                 <div class="w-full flex justify-between gap-4 mt-6">
-                    <primary-button @click="choiceOpen=true; explainOpen=false">
-                        Use the choice helper
-                    </primary-button>
                     <secondary-button @click="explainOpen=false">
                         I want to explore on my own
                     </secondary-button>
+                    <primary-button @click="choiceOpen=true; explainOpen=false">
+                        Use the choice helper
+                    </primary-button>
                 </div>
             </div>
         </modal>

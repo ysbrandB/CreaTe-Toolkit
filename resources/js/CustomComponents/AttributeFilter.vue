@@ -7,13 +7,13 @@ import {computed, nextTick, ref} from "vue";
 
 const props = withDefaults(defineProps<{
     attributeTypes: AttributeType[],
-    initialFilters?: Record<number, number[]>
+    initialFilters?: Record<number, string[]>
     title?: string
 }>(), {
     title: 'filters',
 });
 const emit = defineEmits<{
-    (e: 'update', update:Record<number, number[]>): void
+    (e: 'update', update: Record<number, number[]>): void
 }>()
 
 const check = (attributeType: AttributeType, attribute: Attribute, checked: boolean) => nextTick(() => {
@@ -26,7 +26,6 @@ const check = (attributeType: AttributeType, attribute: Attribute, checked: bool
     if (checkedAttributesMap.value.get(attributeType)?.length === 0) {
         checkedAttributesMap.value.delete(attributeType);
     }
-
     emit('update', checkedAttributes.value);
 });
 
@@ -41,7 +40,7 @@ const addFilterByAttributeId = (id: number) => {
     if (attribute) {
         //find the corresponding attribute type
         const attributeType = props.attributeTypes.find((attributeType) => attributeType.id === attribute.attribute_type_id);
-        if(attributeType && !checkedAttributesMap.value.has(attributeType)){
+        if (attributeType && !checkedAttributesMap.value.has(attributeType)) {
             check(attributeType, attribute, true);
         }
     }
@@ -52,19 +51,32 @@ const reset = () => {
     emit('update', {});
 }
 
+const findAndAddAttribute = (attributeTitle: string) => {
+    for (const attributeType of props.attributeTypes) {
+        const attribute = attributeType.attributes?.find((attribute) => attribute.title === attributeTitle);
+        if (attribute) {
+            check(attributeType, attribute, true);
+            return;
+        }
+    }
+}
+
 const checkedAttributesMap = ref(new Map<AttributeType, Attribute[]>());
 if (props.initialFilters) {
     for (const [attributeTypeId, attributeIds] of Object.entries(props.initialFilters)) {
         const attributeType = props.attributeTypes.find((attributeType) => attributeType.id === parseInt(attributeTypeId));
         if (attributeType) {
             attributeIds.forEach((attributeId) => {
-                const attribute = attributeType.attributes?.find((attribute) => attribute.id === attributeId);
+                const attribute = attributeType.attributes?.find((attribute) => attribute.id === parseInt(attributeId));
                 if (attribute) {
                     check(attributeType, attribute, true);
                 }
             });
         }
     }
+} else {
+    findAndAddAttribute('Actuator')
+    findAndAddAttribute('Sensor')
 }
 
 const checkedAttributes = computed(() => {
@@ -86,7 +98,10 @@ defineExpose({
 })
 </script>
 <template>
-    <div class="w-full text-2xl text-center font-semibold mt-4">{{ capitalizeFirstLetter(title) }}</div>
+    <div class="flex justify-center w-full">
+        <div class="text-2xl text-center font-semibold mt-4">{{ capitalizeFirstLetter(title) }}</div>
+        <pill class="self-end" :color="'red'"></pill>
+    </div>
     <div
         class="mx-2 mt-1 flex flex-wrap text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
         <template v-for="[attributeType, attributes] in checkedAttributesMap.entries()">

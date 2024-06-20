@@ -20,7 +20,7 @@ export interface Item {
     photo_url?: string;
     wiring_photo_url?: string;
     attributes?: Attribute[];
-    json_items?: number[];
+    json_items?: string[];
 }
 
 export interface Attribute {
