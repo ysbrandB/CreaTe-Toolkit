@@ -1,4 +1,4 @@
-import {computed, ComputedRef, ref} from "vue";
+import {computed, ref} from "vue";
 const screens = {
     sm: 640,
     md: 768,
@@ -11,16 +11,14 @@ export enum Breakpoints {
     md = 'md',
     lg = 'lg',
     xl = 'xl',
-    all = 'all'
 }
 const w = ref(window.innerWidth);
 
 const breakpoint = computed(()=>{
-    if ( w.value >= screens.sm && w.value <= screens.md ) return Breakpoints.sm
+    if (w.value <= screens.md ) return Breakpoints.sm
     else if (w.value >= screens.md && w.value <= screens.lg) return Breakpoints.md
     else if (w.value >= screens.lg && w.value <= screens.xl) return Breakpoints.lg
-    else if (w.value >= screens.xl) return Breakpoints.xl
-    else return Breakpoints.all
+    else return Breakpoints.xl
 })
 const debounce = function(func: any, wait: number) {
     let timeout: number | undefined
@@ -45,4 +43,6 @@ window.addEventListener(
     false
 )
 
+w.value = window.innerWidth
+console.log(w.value, breakpoint.value)
 export default breakpoint

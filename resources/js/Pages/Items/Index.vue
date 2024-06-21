@@ -12,7 +12,9 @@ import ItemCard from "@/Pages/Items/ItemCard.vue";
 import Modal from "@/Components/Modal.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import SelectedItemDropdown from "@/CustomComponents/SelectedItemDropdown.vue";
-import breakpoints, {Breakpoints} from '../../CustomComponents/TailwindWidth'
+import {Breakpoints} from '@/CustomComponents/TailwindWidth'
+import MountedTeleport from "@/CustomComponents/MountedTeleport.vue";
+import breakpoint from "../../CustomComponents/TailwindWidth";
 
 
 const props = defineProps<{
@@ -65,7 +67,7 @@ const filter: Ref<typeof AttributeFilter | null> = ref(null);
 
 const removeItemFromSelected = (id: number) => {
     const item = Array.from(selectedItems.value).find((item) => item.id === id);
-    if(item) {
+    if (item) {
         selectedItems.value.delete(item);
     }
 }
@@ -76,7 +78,17 @@ const addItemToSelected = (id: number) => {
         selectedItems.value.add(item);
     }
 }
-
+const phoneModalOpen = ref(false);
+const lastBreakpoint = ref(breakpoint.value);
+watch(breakpoint, (br) => {
+    if (breakpoint.value === Breakpoints.sm && lastBreakpoint.value !== Breakpoints.sm) {
+        phoneModalOpen.value = false;
+        lastBreakpoint.value = Breakpoints.sm;
+    } else {
+        lastBreakpoint.value = breakpoint.value;
+    }
+});
+const shouldModal = computed(() => breakpoint.value === Breakpoints.sm);
 </script>
 
 <template>
@@ -102,35 +114,46 @@ const addItemToSelected = (id: number) => {
             </div>
         </template>
 
-        <section class="w-full h-full mx-auto">
+        <section class="relative w-full h-full mx-auto">
+            <button class="fixed bottom-0 right-0" v-if="shouldModal"
+                    @click="phoneModalOpen=true">
+                <card class="font-bold" :additional-classes="'mr-2 shadow p-2 border-dashed border-2 border-gray-700'">
+                    Filters
+                </card>
+            </button>
             <div class="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-12  gap-4 max-w-[90%] mx-auto">
                 <div class="col-span-3 md:pt-0 mt-2">
-                    <card class="">
-                        <div class="w-full text-center">
-                            <attribute-filter
-                                ref="filter"
-                                @update="reloadWithFilters"
-                                :attribute-types="attributeTypes"
-                                :initial-filters="initialFilters"/>
-                        </div>
-                    </card>
+                    <MountedTeleport to="#attributeModal" :disabled="!shouldModal">
+                        <card class="">
+                            <div class="w-full text-center">
+                                <attribute-filter
+                                    ref="filter"
+                                    @update="reloadWithFilters"
+                                    :attribute-types="attributeTypes"
+                                    :initial-filters="initialFilters"/>
+                            </div>
+                        </card>
+                    </MountedTeleport>
                 </div>
                 <div class="lg:col-span-9 col-span-3">
-                    <div class="grid lg:grid-cols-4 grid-cols-2 gap-4 mt-4">
-                        <item-card :item="item" v-for="item in items">
-                            <template #qr>
-                                <button v-if="selectedItemIds.find((id) => id === item.id)" @click="removeItemFromSelected(item.id)"
-                                        class="bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-500 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150"
-                                        style="border-radius:.5em;font-size: 1.1em; width:3.5em; height:3em; align-self: flex-end;">
-                                    -
-                                </button>
-                                <button v-else @click="addItemToSelected(item.id)"
-                                        class="bg-grey-100 dark:bg-gray-800 border border-grey-300 dark:border-gray-500 font-semibold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-widest shadow-sm hover:bg-emerald-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-25 transition ease-in-out duration-150"
-                                        style="border-radius:.5em;font-size: 1.1em; width:3.5em; height:3em; align-self: flex-end;">
-                                    +
-                                </button>
-                            </template>
-                        </item-card>
+                    <div class="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4 mt-4">
+                        <div class="md:mx-0 md:max-w-full max-w-[70%] w-full mx-auto" v-for="item in items">
+                            <item-card :item="item">
+                                <template #qr>
+                                    <button v-if="selectedItemIds.find((id) => id === item.id)"
+                                            @click="removeItemFromSelected(item.id)"
+                                            class="bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-500 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150"
+                                            style="border-radius:.5em;font-size: 1.1em; width:3.5em; height:3em; align-self: flex-end;">
+                                        -
+                                    </button>
+                                    <button v-else @click="addItemToSelected(item.id)"
+                                            class="bg-grey-100 dark:bg-gray-800 border border-grey-300 dark:border-gray-500 font-semibold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-widest shadow-sm hover:bg-emerald-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-25 transition ease-in-out duration-150"
+                                            style="border-radius:.5em;font-size: 1.1em; width:3.5em; height:3em; align-self: flex-end;">
+                                        +
+                                    </button>
+                                </template>
+                            </item-card>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -199,6 +222,11 @@ const addItemToSelected = (id: number) => {
                         Use the choice helper
                     </primary-button>
                 </div>
+            </div>
+        </modal>
+        <modal :show="shouldModal && phoneModalOpen" @close="phoneModalOpen=false">
+            <div class="attributeModal" id="attributeModal">
+                <!--            the attribute filter will be put here when the screen is in the mobile range-->
             </div>
         </modal>
     </AuthenticatedLayout>
