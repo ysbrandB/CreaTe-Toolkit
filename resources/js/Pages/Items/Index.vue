@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import NavLink from "@/Components/NavLink.vue";
-import {router, usePage} from "@inertiajs/vue3";
+import {router} from "@inertiajs/vue3";
 import {AttributeType, Item, Question} from "@/types";
 import Card from "@/Components/Card.vue";
 import AttributeFilter from "@/CustomComponents/AttributeFilter.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import {computed, onMounted, Ref, ref, watch} from "vue";
+import {computed, onMounted, Ref, ref, watch, toRaw} from "vue";
 import axios from "axios";
 import ItemCard from "@/Pages/Items/ItemCard.vue";
 import Modal from "@/Components/Modal.vue";
@@ -23,8 +23,8 @@ const props = defineProps<{
     initialSelectedItems: Item[],
     explainer: boolean,
 }>();
-const page = usePage();
-const selectedItems = ref(new Set<Item>(props.initialSelectedItems ?? []));
+const selectedItems = ref(new Set<Item>(toRaw(props.initialSelectedItems) ?? []));
+const selectedItemIds = computed(() => Array.from(selectedItems.value).map((item) => item.id));
 const reloadWithFilters = (filters: Record<number, number[]>) => {
     router.reload({
         data: {
@@ -35,9 +35,9 @@ const reloadWithFilters = (filters: Record<number, number[]>) => {
 };
 
 onMounted(() => {
-    watch(selectedItems.value, (selected) => {
+    watch(selectedItems.value, () => {
         axios.post(route('graph.syncSelected'), {
-            selected: Array.from(selected).map((item: Item) => item.id)
+            selected: selectedItemIds.value
         });
     })
 });
@@ -62,6 +62,20 @@ const choiceIndex = ref(0);
 const explainOpen = ref(props.explainer);
 const question = computed(() => props.questions[choiceIndex.value]);
 const filter: Ref<typeof AttributeFilter | null> = ref(null);
+
+const removeItemFromSelected = (id: number) => {
+    const item = Array.from(selectedItems.value).find((item) => item.id === id);
+    if(item) {
+        selectedItems.value.delete(item);
+    }
+}
+
+const addItemToSelected = (id: number) => {
+    const item = props.items.find((item) => item.id === id);
+    if (item) {
+        selectedItems.value.add(item);
+    }
+}
 
 </script>
 
@@ -105,12 +119,12 @@ const filter: Ref<typeof AttributeFilter | null> = ref(null);
                     <div class="grid lg:grid-cols-4 grid-cols-2 gap-4 mt-4">
                         <item-card :item="item" v-for="item in items">
                             <template #qr>
-                                <button v-if="selectedItems.has(item)" @click="selectedItems.delete(item)"
+                                <button v-if="selectedItemIds.find((id) => id === item.id)" @click="removeItemFromSelected(item.id)"
                                         class="bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-500 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150"
                                         style="border-radius:.5em;font-size: 1.1em; width:3.5em; height:3em; align-self: flex-end;">
                                     -
                                 </button>
-                                <button v-else @click="selectedItems.add(item)"
+                                <button v-else @click="addItemToSelected(item.id)"
                                         class="bg-grey-100 dark:bg-gray-800 border border-grey-300 dark:border-gray-500 font-semibold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-widest shadow-sm hover:bg-emerald-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-25 transition ease-in-out duration-150"
                                         style="border-radius:.5em;font-size: 1.1em; width:3.5em; height:3em; align-self: flex-end;">
                                     +

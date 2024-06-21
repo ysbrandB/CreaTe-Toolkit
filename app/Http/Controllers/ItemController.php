@@ -39,7 +39,7 @@ class ItemController extends Controller
             'attributeTypes' => AttributeType::with('attributes')->orderBy('created_at', 'desc')->get(),
             'initialFilters' => $filters,
             'questions' => Question::with('answers.attributes:id')->get(),
-            'initialSelectedItems' => Item::whereIn('id', $request->session()->get('selected') ?? [])->get(),
+            'initialSelectedItems' => Item::query()->with('attributes.attributeType')->whereIn('id', $request->session()->get('selected') ?? [])->get(),
             'explainer' => $showInitialExplainer,
         ]);
     }

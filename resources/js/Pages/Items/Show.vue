@@ -63,31 +63,31 @@ onMounted(() => {
                 <div class="col-span-3 md:col-span-9 mt-4">
                     <OpeningCard title="Description" :open="true">
                         <template #content v-if="item.description">
-                            <div v-html="renderMarkdown(item.description)"></div>
+                            <article class="prose" v-html="renderMarkdown(item.description)"></article>
                         </template>
                     </OpeningCard>
 
                     <OpeningCard title="Pros" v-if="item.pros">
                         <template #content>
-                            <div v-html="renderMarkdown(item.pros)"></div>
+                            <article class="prose" v-html="renderMarkdown(item.pros)"></article>
                         </template>
                     </OpeningCard>
 
                     <OpeningCard title="Cons" v-if="item.cons">
                         <template #content>
-                            <div v-html="renderMarkdown(item.cons)"></div>
+                            <article class="prose" v-html="renderMarkdown(item.cons)"></article>
                         </template>
                     </OpeningCard>
 
                     <OpeningCard title="Hardware considerations" v-if="item.hardware_considerations">
                         <template #content>
-                            <div v-html="renderMarkdown(item.hardware_considerations)"></div>
+                            <article class="prose" v-html="renderMarkdown(item.hardware_considerations)"></article>
                         </template>
                     </OpeningCard>
 
                     <OpeningCard title="Software considerations" v-if="item.software_considerations">
                         <template #content>
-                            <div v-html="renderMarkdown(item.software_considerations)"></div>
+                            <article class="prose" v-html="renderMarkdown(item.software_considerations)"></article>
                         </template>
                     </OpeningCard>
 
@@ -97,7 +97,7 @@ onMounted(() => {
                                 <img :src="item.wiring_photo_url" width="400" class="rounded-lg" alt="wiring diagram">
                                 Wiring diagram
                             </div>
-                            <div v-html="renderMarkdown(item.wiring_instructions)"></div>
+                            <article class="prose" v-html="renderMarkdown(item.wiring_instructions)"></article>
                         </template>
                     </OpeningCard>
 

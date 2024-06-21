@@ -88,8 +88,8 @@ const configs = reactive(
                     return d3
                         .forceSimulation(nodes)
                         .force("edge", forceLink.distance(40).strength(0.5))
-                        .force("charge", d3.forceManyBody().strength(-800))
-                        .force("center", d3.forceCenter().strength(0.05))
+                        .force("charge", d3.forceManyBody().strength(-1000))
+                        .force("center", d3.forceCenter().strength(0.01))
                         .alphaMin(0.001)
                 }
             }),

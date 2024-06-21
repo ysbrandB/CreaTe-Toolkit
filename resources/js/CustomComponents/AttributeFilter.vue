@@ -98,9 +98,10 @@ defineExpose({
 })
 </script>
 <template>
-    <div class="flex justify-center w-full">
-        <div class="text-2xl text-center font-semibold mt-4">{{ capitalizeFirstLetter(title) }}</div>
-        <pill class="self-end" :color="'red'"></pill>
+    <div class="flex justify-items-center items-end  mt-4 w-full">
+      <div class="bg-red-100 basis-1/3 grow"></div>
+        <div class="text-2xl text-center basis-1/3 font-semibold grow">{{ capitalizeFirstLetter(title) }}</div>
+       <div class="grow basis-1/3 mb-1"> <pill v-if="checkedAttributesMap.size" class="cursor-pointer" @click="reset()" :color="'red'"> Clear all filters</pill> </div>
     </div>
     <div
         class="mx-2 mt-1 flex flex-wrap text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
