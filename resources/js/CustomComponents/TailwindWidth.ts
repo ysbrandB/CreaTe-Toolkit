@@ -44,5 +44,4 @@ window.addEventListener(
 )
 
 w.value = window.innerWidth
-console.log(w.value, breakpoint.value)
 export default breakpoint
