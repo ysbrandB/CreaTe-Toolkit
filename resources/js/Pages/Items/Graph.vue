@@ -12,7 +12,7 @@ import {
     ForceEdgeDatum,
 } from "v-network-graph/lib/force-layout"
 import Card from "@/Components/Card.vue";
-import {Item, PageProps} from "@/types";
+import {Item} from "@/types";
 import SelectedItemDropdown from "@/CustomComponents/SelectedItemDropdown.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import axios from "axios";
@@ -29,6 +29,23 @@ const props = defineProps<{
     python: Item,
     initialSelectedItems: Item[]
 }>();
+
+
+const selectedItems = ref(new Set<Item>(props.initialSelectedItems ?? []))
+onMounted(() => {
+    watch(selectedItems.value, (selected) => {
+        axios.post(route('graph.syncSelected'), {
+            selected: Array.from(selected).map((item: Item) => item.id)
+        }).then(()=>{
+            router.reload({
+                only: ['items', 'nodes', 'initialSelectedItems'],
+                onSuccess: (e) => {
+                    calculate(e);
+                }
+            })
+        })
+    })
+});
 
 const page = usePage();
 const nodes = ref({})
@@ -56,12 +73,24 @@ const calculate = (pageProps: any) =>{
     });
 
     //filter out the myEdges where source is target and target is source from another item
+    let sameEdges = new Map<string, number>();
     Array.from(myEdges).forEach((edge: Edge, index: number) => {
+        //@ts-ignore
+        sameEdges.set(`${edge.source}-${edge.target}`, sameEdges.get(`${edge.source}-${edge.target}`) + 1 || 1)
         if (!myEdges.has({source: edge.target, target: edge.source})) {
             //@ts-ignore
             edges.value[`edge${index}`] = edge
         }
     });
+    //if the node is not needed, because it is referenced by all selected nodes and therefore there is a shorter path, delete it.
+    //@ts-ignore
+    sameEdges.entries().forEach(([key, value]) => {
+        if (value >= selectedItems.value.size && selectedItems.value.size > 0) {
+            const [_, target] = key.split('-')
+            //@ts-ignore
+            delete nodes.value[target]
+        }
+    })
 }
 
 calculate(page);
@@ -130,22 +159,6 @@ const configs = reactive(
         },
     })
 )
-
-const selectedItems = ref(new Set<Item>(props.initialSelectedItems ?? []))
-onMounted(() => {
-    watch(selectedItems.value, (selected) => {
-        axios.post(route('graph.syncSelected'), {
-            selected: Array.from(selected).map((item: Item) => item.id)
-        }).then(()=>{
-            router.reload({
-                only: ['items', 'nodes', 'initialSelectedItems'],
-                onSuccess: (e) => {
-                    calculate(e);
-                }
-            })
-        })
-    })
-});
 </script>
 
 <template>

@@ -208,7 +208,9 @@ const submit = () => {
                                 <option v-for="selectableItem in items"
                                         :value="selectableItem.id"
                                         :key="selectableItem.id"
-                                        :selected="selectableItem.id.toString()===selectedItemId">
+                                        :selected="
+                                        // @ts-ignore
+                                        selectableItem.id===selectedItemId||selectableItem.id.toString()===selectedItemId">
                                     {{ selectableItem.title }}
                                 </option>
                             </select>
