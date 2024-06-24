@@ -10,6 +10,7 @@
         "laravel/framework": "^11.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
+        "sentry/sentry-laravel": "^4.6",
         "tightenco/ziggy": "^2.0",
         "vinkla/hashids": "^12.0"
     },
