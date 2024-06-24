@@ -102,7 +102,7 @@ defineExpose({
         <div class="bg-red-100 basis-1/3 grow"></div>
         <div class="text-2xl text-center basis-1/3 font-semibold grow">{{ capitalizeFirstLetter(title) }}</div>
         <div class="grow basis-1/3 mb-1">
-            <pill v-if="checkedAttributesMap.size" class="cursor-pointer" @click="reset()" :color="'red'"> Clear all
+            <pill v-if="checkedAttributesMap.size" class="cursor-pointer nowrap" @click="reset()" :color="'red'"> Clear
                 filters
             </pill>
         </div>

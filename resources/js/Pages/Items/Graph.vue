@@ -4,7 +4,7 @@ import {Head, router, usePage} from '@inertiajs/vue3';
 import {Configs, Edges, VNetworkGraph} from "v-network-graph"
 import "v-network-graph/lib/style.css"
 import 'd3-force';
-import {onMounted, reactive, ref, watch} from "vue"
+import {onMounted, reactive, Ref, ref, watch} from "vue"
 import * as vNG from "v-network-graph"
 import {
     ForceLayout,
@@ -17,10 +17,9 @@ import SelectedItemDropdown from "@/CustomComponents/SelectedItemDropdown.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import axios from "axios";
 
-interface Edge extends vNG.Edge {
-    width?: number
-    color?: string
-    dashed?: boolean
+interface Node extends vNG.Node {
+    title: string,
+    photo_url: string,
 }
 
 const props = defineProps<{
@@ -36,7 +35,7 @@ onMounted(() => {
     watch(selectedItems.value, (selected) => {
         axios.post(route('graph.syncSelected'), {
             selected: Array.from(selected).map((item: Item) => item.id)
-        }).then(()=>{
+        }).then(() => {
             router.reload({
                 only: ['items', 'nodes', 'initialSelectedItems'],
                 onSuccess: (e) => {
@@ -48,18 +47,17 @@ onMounted(() => {
 });
 
 const page = usePage();
-const nodes = ref({})
-const edges = ref({})
-const calculate = (pageProps: any) =>{
-    const myEdges: Set<Edge> = new Set<Edge>();
+const nodes: Ref<Record<string, Node>> = ref({})
+const edges: Ref<Record<string, vNG.Edge>> = ref({})
+const calculate = (pageProps: any) => {
+    const myEdges: Set<vNG.Edge> = new Set<vNG.Edge>();
     nodes.value = {};
     edges.value = {};
 
     (pageProps.props as typeof props).nodes.forEach((node: Item) => {
-        //@ts-ignore
         nodes.value[`node${node.id}`] = {
-            name: node.title,
-            photo_url: node.photo_url,
+            title: node.title,
+            photo_url: node.photo_url ?? "",
             public_id: node.public_id
         }
     });
@@ -67,30 +65,28 @@ const calculate = (pageProps: any) =>{
     (pageProps.props as typeof props).items.forEach((item: Item) => {
         const list = [item.id, ...item.json_items ?? [], props.python.id]
         for (let i = 0; i < list.length - 1; i++) {
-            //@ts-ignore
             myEdges.add({source: `node${list[i]}`, target: `node${list[i + 1]}`})
         }
     });
 
     //filter out the myEdges where source is target and target is source from another item
     let sameEdges = new Map<string, number>();
-    Array.from(myEdges).forEach((edge: Edge, index: number) => {
-        //@ts-ignore
-        sameEdges.set(`${edge.source}-${edge.target}`, sameEdges.get(`${edge.source}-${edge.target}`) + 1 || 1)
+    Array.from(myEdges).forEach((edge: vNG.Edge, index: number) => {
+        sameEdges.set(`${edge.source}-${edge.target}`, (sameEdges.get(`${edge.source}-${edge.target}`) ?? 0) + 1);
         if (!myEdges.has({source: edge.target, target: edge.source})) {
-            //@ts-ignore
             edges.value[`edge${index}`] = edge
         }
     });
     //if the node is not needed, because it is referenced by all selected nodes and therefore there is a shorter path, delete it.
-    //@ts-ignore
-    sameEdges.entries().forEach(([key, value]) => {
-        if (value >= selectedItems.value.size && selectedItems.value.size > 0) {
-            const [_, target] = key.split('-')
-            //@ts-ignore
-            delete nodes.value[target]
+    const selectedItemIds =Array.from(selectedItems.value).map((item: Item) => item.id)
+    for (let [nodeString, timesSeen] of sameEdges) {
+        if (timesSeen >= selectedItems.value.size && selectedItems.value.size > 0) {
+            const [_, target] = nodeString.split('-')
+            if(!selectedItemIds.includes(parseInt(target.replace('node', '')))) {
+                delete nodes.value[target]
+            }
         }
-    })
+    }
 }
 
 calculate(page);
@@ -98,9 +94,7 @@ calculate(page);
 const eventHandlers: vNG.EventHandlers = {
     "node:click": ({node}) => {
         // toggle
-        router.get(route('items.show',
-            // @ts-ignore
-            {public_id: nodes.value[node].public_id}))
+        router.get(route('items.show', {public_id: nodes.value[node].public_id}))
     },
 }
 
@@ -112,8 +106,7 @@ const configs = reactive(
                 positionFixedByClickWithAltKey: true,
                 createSimulation: (d3, nodes, edges) => {
                     // d3-force parameters
-                    //@ts-ignore
-                    const forceLink = d3.forceLink<ForceNodeDatum, ForceEdgeDatum>(edges).id(d => d.id)
+                    const forceLink = d3.forceLink<ForceNodeDatum, ForceEdgeDatum>(edges).id((d: vNG.Edge) => d.id)
                     return d3
                         .forceSimulation(nodes)
                         .force("edge", forceLink.distance(40).strength(0.5))
@@ -136,7 +129,7 @@ const configs = reactive(
                 color: "#000000",
                 margin: 4,
                 direction: "south",
-                text: "name",
+                text: "title",
             },
         },
         edge: {
@@ -176,7 +169,7 @@ const configs = reactive(
                         <primary-button
                             class="mt-2 w-fit self-end"
                             @click="router.get(route('items.index'))">
-                            Select {{selectedItems.size<0?'some':'more'}} items!
+                            Select {{ selectedItems.size < 0 ? 'some' : 'more' }} items!
                         </primary-button>
                     </template>
                 </selected-item-dropdown>
@@ -212,9 +205,7 @@ const configs = reactive(
                         :y="-config.radius * scale"
                         :width="config.radius * scale * 2"
                         :height="config.radius * scale * 2"
-                        :xlink:href="
-                        //@ts-ignore
-                        `${nodes[nodeId].photo_url}`"
+                        :xlink:href="`${nodes[nodeId].photo_url}`"
                         clip-path="url(#faceCircle)"
                     />
                     <!-- circle for drawing stroke -->
