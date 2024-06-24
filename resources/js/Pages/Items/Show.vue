@@ -63,31 +63,31 @@ onMounted(() => {
                 <div class="col-span-3 md:col-span-9 mt-4">
                     <OpeningCard title="Description" :open="true">
                         <template #content v-if="item.description">
-                            <article class="prose" v-html="renderMarkdown(item.description)"></article>
+                            <article class="mx-auto mt-3 w-full prose" v-html="renderMarkdown(item.description)"></article>
                         </template>
                     </OpeningCard>
 
                     <OpeningCard title="Pros" v-if="item.pros">
                         <template #content>
-                            <article class="prose" v-html="renderMarkdown(item.pros)"></article>
+                            <article class="mx-auto mt-3 prose" v-html="renderMarkdown(item.pros)"></article>
                         </template>
                     </OpeningCard>
 
                     <OpeningCard title="Cons" v-if="item.cons">
                         <template #content>
-                            <article class="prose" v-html="renderMarkdown(item.cons)"></article>
+                            <article class="mx-auto mt-3 prose" v-html="renderMarkdown(item.cons)"></article>
                         </template>
                     </OpeningCard>
 
                     <OpeningCard title="Hardware considerations" v-if="item.hardware_considerations">
                         <template #content>
-                            <article class="prose" v-html="renderMarkdown(item.hardware_considerations)"></article>
+                            <article class="mx-auto mt-3 prose" v-html="renderMarkdown(item.hardware_considerations)"></article>
                         </template>
                     </OpeningCard>
 
                     <OpeningCard title="Software considerations" v-if="item.software_considerations">
                         <template #content>
-                            <article class="prose" v-html="renderMarkdown(item.software_considerations)"></article>
+                            <article class="mx-auto mt-3 prose" v-html="renderMarkdown(item.software_considerations)"></article>
                         </template>
                     </OpeningCard>
 
@@ -97,7 +97,7 @@ onMounted(() => {
                                 <img :src="item.wiring_photo_url" width="400" class="rounded-lg" alt="wiring diagram">
                                 Wiring diagram
                             </div>
-                            <article class="prose" v-html="renderMarkdown(item.wiring_instructions)"></article>
+                            <article class="mx-auto mt-3 prose" v-html="renderMarkdown(item.wiring_instructions)"></article>
                         </template>
                     </OpeningCard>
 
