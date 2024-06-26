@@ -38,7 +38,7 @@ onMounted(() => {
 
 onMounted(()=>{
     document.querySelectorAll('pre code').forEach((block) => {
-        hljs.highlightElement(block);
+        hljs.highlightElement(block as HTMLElement);
     });
 })
 </script>

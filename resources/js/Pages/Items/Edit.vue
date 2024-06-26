@@ -22,7 +22,7 @@ const props = defineProps<{
 const itemPhotos: Ref<{
     url: string,
     id: number
-}[]> = ref(props.item?.photos.map((photo) => {
+}[]> = ref(props.item?.photos?.map((photo) => {
     return {
         'url': photo.url,
         'id': photo.id

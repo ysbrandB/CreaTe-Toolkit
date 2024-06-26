@@ -21,7 +21,7 @@ const breakpoint = computed(()=>{
     else return Breakpoints.xl
 })
 const debounce = function(func: any, wait: number) {
-    let timeout: number | undefined
+    let timeout: ReturnType<typeof setTimeout> | undefined
     return () => {
         const later = function() {
             timeout = undefined
