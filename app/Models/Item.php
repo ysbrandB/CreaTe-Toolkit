@@ -90,4 +90,9 @@ class Item extends Model
     {
         return Hashids::encode($this->id);
     }
+
+    public function photos(): HasMany
+    {
+        return $this->hasMany(Photo::class);
+    }
 }

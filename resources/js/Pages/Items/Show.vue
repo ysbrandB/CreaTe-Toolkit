@@ -15,14 +15,12 @@ import QrcodeVue from 'qrcode.vue'
 import Pill from "@/CustomComponents/Pill.vue";
 import HighlightJSVuePlugin from '@highlightjs/vue-plugin';
 import 'highlight.js/lib/common';
-
-const VHighlightjs = HighlightJSVuePlugin.component;
 import 'highlight.js/styles/atom-one-dark.css';
-
+import hljs from 'highlight.js';
 import {marked} from 'marked';
 import ItemCard from "@/Pages/Items/ItemCard.vue";
 import SelectedItemDropdown from "@/CustomComponents/SelectedItemDropdown.vue";
-import {router, usePage} from "@inertiajs/vue3";
+import {usePage} from "@inertiajs/vue3";
 import {onMounted, ref, watch} from "vue";
 import axios from "axios";
 
@@ -37,6 +35,12 @@ onMounted(() => {
         });
     })
 });
+
+onMounted(()=>{
+    document.querySelectorAll('pre code').forEach((block) => {
+        hljs.highlightElement(block);
+    });
+})
 </script>
 
 <template>
@@ -103,7 +107,7 @@ onMounted(() => {
 
                     <OpeningCard title="Example code" v-if="item.example_code">
                         <template #content>
-                            <v-highlightjs autodetect :code="item.example_code??''" class="w-full sm:text-sm"/>
+                            <article class="mx-auto mt-3 prose" v-html="renderMarkdown(item.example_code)"></article>
                         </template>
                     </OpeningCard>
                 </div>

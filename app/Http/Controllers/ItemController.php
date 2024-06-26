@@ -114,7 +114,7 @@ class ItemController extends Controller
         }
 
         return Inertia::render('Items/Edit', [
-            'item' => Item::with('attributes')->findorFail($id),
+            'item' => Item::with('attributes', 'photos')->findorFail($id),
             'items' => Item::query()->select('id', 'title')->get(),
             'attributeTypes' => AttributeType::with('attributes')->get(),
             'myAttributes' => $myAttributes,

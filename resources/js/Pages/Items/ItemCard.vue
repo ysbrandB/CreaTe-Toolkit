@@ -23,7 +23,7 @@ const props = defineProps<{
                      alt="item photo">
             </Link>
             <div style="display: flex; flex-direction: column; height:13.2em; margin-top: .3em; gap:.3em">
-                <div style="color: #718096; font-size: 0.875em; overflow: hidden; flex-grow: 1">
+                <div style="color: #2D3748; font-size: 0.92em; overflow: hidden; flex-grow: 1">
                     {{ item.card_description }}
                 </div>
                 <div style="display: flex; flex-wrap:wrap;">
