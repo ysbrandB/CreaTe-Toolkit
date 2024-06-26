@@ -24,7 +24,7 @@ class example_code_to_markdown extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): void
     {
         foreach (Item::all() as $item) {
             $item->example_code = $this->convertCodeToMarkdown($item->example_code);
@@ -35,7 +35,7 @@ class example_code_to_markdown extends Command
     private function convertCodeToMarkdown(string $code): string
     {
         return '```
-' . $code . '
+'.$code.'
 ```';
     }
 }

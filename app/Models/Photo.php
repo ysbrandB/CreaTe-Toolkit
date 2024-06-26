@@ -19,12 +19,13 @@ class Photo extends Model
     {
         return $this->belongsTo(Item::class);
     }
+
     public function getUrlAttribute(): string
     {
         return asset('storage/photos/'.$this->path);
     }
 
-    public static function boot(): void
+    protected static function boot(): void
     {
         parent::boot();
         static::deleting(static function (Photo $photo): void {

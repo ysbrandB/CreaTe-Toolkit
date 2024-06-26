@@ -14,7 +14,7 @@ class PhotoController extends Controller
         $item = Item::findOrFail($itemId);
         $photo = $request->file('photo');
 
-        if(!$photo) {
+        if (! $photo) {
             return response()->json(['error' => 'No photo provided'], 400);
         }
 
@@ -25,7 +25,7 @@ class PhotoController extends Controller
             'path' => $photo->hashName(),
         ]);
 
-        return ['url'=>$photoModel->url, 'id'=>$photoModel->id];
+        return ['url' => $photoModel->url, 'id' => $photoModel->id];
     }
 
     public function destroy(Request $request, int $itemId, int $photoId)
@@ -33,7 +33,7 @@ class PhotoController extends Controller
         $item = Item::findOrFail($itemId);
         $photo = Photo::findOrFail($photoId);
 
-        if($photo->item_id !== $item->id) {
+        if ($photo->item_id !== $item->id) {
             return response()->json(['error' => 'Photo does not belong to item'], 400);
         }
 
