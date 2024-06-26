@@ -28,7 +28,7 @@ class QuestionController extends Controller
     public function store(Request $request)
     {
         $question = Question::create($request->only('title', 'description'));
-        foreach ($request->input('answers')??[] as $newAnswer) {
+        foreach ($request->input('answers') ?? [] as $newAnswer) {
             $answer = $question->answers()->updateOrCreate(['id' => $newAnswer['id'] ?? null], ['text' => $newAnswer['text']]);
             $answer->attributes()->sync(collect($newAnswer['attributes'])->pluck('id'));
         }
@@ -48,7 +48,7 @@ class QuestionController extends Controller
     {
         $question = Question::findOrFail($id);
         $question->update($request->only('text', 'description'));
-        foreach ($request->input('answers')??[] as $newAnswer) {
+        foreach ($request->input('answers') ?? [] as $newAnswer) {
             $answer = $question->answers()->updateOrCreate(['id' => $newAnswer['id'] ?? null], ['text' => $newAnswer['text']]);
             $answer->attributes()->sync(collect($newAnswer['attributes'])->pluck('id'));
         }
