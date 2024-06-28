@@ -4,14 +4,28 @@ import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import {Head, router, useForm} from '@inertiajs/vue3';
-import MarkDownTextArea from "@/CustomComponents/MarkDownTextArea.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Card from "@/Components/Card.vue";
 import {AttributeType, Item} from "@/types";
 import AttributeFilter from "@/CustomComponents/AttributeFilter.vue";
 import axios from "axios";
 import {Ref, ref} from "vue";
-import * as repl from "node:repl";
+
+import '@kangc/v-md-editor/lib/style/base-editor.css';
+//@ts-ignore
+import githubTheme from '@kangc/v-md-editor/lib/theme/github.js';
+//@ts-ignore
+import VMdEditor from '@kangc/v-md-editor';
+
+//@ts-ignore
+import enUS from '@kangc/v-md-editor/lib/lang/en-US';
+
+// highlightjs
+import hljs from 'highlight.js';
+
+VMdEditor.use(githubTheme,{
+    Hljs: hljs,
+}).lang.use('en-US', enUS);
 
 const props = defineProps<{
     item?: Item,
