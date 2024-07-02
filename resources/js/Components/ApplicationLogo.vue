@@ -1,3 +1,3 @@
 <template>
- Sports toolkit v1
+<img class="rounded" src="/storage/logo.jpg" alt="Application logo" />
 </template>

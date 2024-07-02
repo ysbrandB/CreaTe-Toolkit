@@ -39,7 +39,7 @@ window.addEventListener(
     'resize',
     debounce(() => {
         w.value = window.innerWidth
-    }, 200),
+    }, 100),
     false
 )
 
