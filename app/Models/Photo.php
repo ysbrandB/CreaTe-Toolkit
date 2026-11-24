@@ -11,8 +11,10 @@ class Photo extends Model
 {
     use HasFactory;
 
+    #[\Override]
     protected $fillable = ['item_id', 'path'];
 
+    #[\Override]
     protected $appends = ['url'];
 
     public function item(): BelongsTo

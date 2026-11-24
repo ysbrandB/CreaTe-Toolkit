@@ -20,8 +20,10 @@ class AttributeType extends Model
      */
     public static mixed $colors = ['red', 'orange', 'amber', 'yellow', 'lime', 'green', 'emerald', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose', 'neutral'];
 
+    #[\Override]
     protected $fillable = ['title', 'description', 'color'];
 
+    #[\Override]
     protected $hidden = ['created_at', 'updated_at'];
 
     public function attributes(): HasMany

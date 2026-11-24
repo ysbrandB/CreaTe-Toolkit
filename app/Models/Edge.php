@@ -10,12 +10,14 @@ class Edge extends Model
 {
     use HasFactory;
 
+    #[\Override]
     protected $fillable = [
         'from_item_id',
         'to_item_id',
         'belongsto_item_id',
     ];
 
+    #[\Override]
     protected $hidden = ['created_at', 'updated_at'];
 
     public function fromItem(): BelongsTo
