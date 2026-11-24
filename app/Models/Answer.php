@@ -11,8 +11,10 @@ class Answer extends Model
 {
     use HasFactory;
 
+    #[\Override]
     protected $hidden = ['created_at', 'updated_at'];
 
+    #[\Override]
     protected $fillable = [
         'text',
     ];

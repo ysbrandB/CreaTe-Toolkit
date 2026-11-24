@@ -10,10 +10,13 @@ class Question extends Model
 {
     use HasFactory;
 
+    #[\Override]
     protected $fillable = ['title', 'description'];
 
+    #[\Override]
     protected $with = ['answers'];
 
+    #[\Override]
     protected $hidden = ['created_at', 'updated_at'];
 
     public function answers(): HasMany

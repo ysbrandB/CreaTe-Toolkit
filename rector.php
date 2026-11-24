@@ -13,4 +13,4 @@ return RectorConfig::configure()
         __DIR__.'/tests',
     ])
     ->withPreparedSets(true, true, true, true, true, true, true, true, true)
-    ->withPhpSets(php82: true);
+    ->withPhpSets(php85: true);

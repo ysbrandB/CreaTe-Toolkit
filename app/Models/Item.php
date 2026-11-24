@@ -33,6 +33,7 @@ class Item extends Model
     /**
      * @var HigherOrderCollectionProxy|mixed
      */
+    #[\Override]
     protected $fillable = [
         'title',
         'description',
@@ -48,12 +49,16 @@ class Item extends Model
         'json_items',
     ];
 
+    #[\Override]
     protected $with = ['attributes'];
 
+    #[\Override]
     protected $appends = ['public_id', 'photo_url', 'wiring_photo_url'];
 
+    #[\Override]
     protected $hidden = ['created_at', 'updated_at'];
 
+    #[\Override]
     protected $casts = [
         'json_items' => 'json',
     ];

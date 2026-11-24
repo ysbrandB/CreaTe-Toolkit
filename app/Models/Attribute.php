@@ -15,8 +15,10 @@ class Attribute extends Model
 {
     use HasFactory;
 
+    #[\Override]
     protected $fillable = ['title', 'description', 'attribute_type_id'];
 
+    #[\Override]
     protected $hidden = ['pivot', 'created_at', 'updated_at'];
 
     public function items(): BelongsToMany

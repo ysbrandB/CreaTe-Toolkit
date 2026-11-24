@@ -12,6 +12,7 @@ class example_code_to_markdown extends Command
      *
      * @var string
      */
+    #[\Override]
     protected $signature = 'app:example_code_to_markdown';
 
     /**
@@ -19,6 +20,7 @@ class example_code_to_markdown extends Command
      *
      * @var string
      */
+    #[\Override]
     protected $description = 'Command description';
 
     /**
