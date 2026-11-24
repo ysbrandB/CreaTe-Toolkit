@@ -6,7 +6,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.5",
-        "inertiajs/inertia-laravel": "^2.0",
+        "inertiajs/inertia-laravel": "^3.0",
         "laravel/framework": "^13.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^v3.2.0",
@@ -22,7 +22,7 @@
         "laravel/sail": "^v1.71.0",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.0",
-        "phpunit/phpunit": "^11.0.1",
+        "phpunit/phpunit": "^13.4.8",
         "rector/rector": "^2.8.3",
         "spatie/laravel-ignition": "^2.4"
     },
