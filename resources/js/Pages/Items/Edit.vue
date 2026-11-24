@@ -10,22 +10,8 @@ import {AttributeType, Item} from "@/types";
 import AttributeFilter from "@/CustomComponents/AttributeFilter.vue";
 import axios from "axios";
 import {Ref, ref} from "vue";
-
-import '@kangc/v-md-editor/lib/style/base-editor.css';
-//@ts-ignore
-import githubTheme from '@kangc/v-md-editor/lib/theme/github.js';
-//@ts-ignore
-import VMdEditor from '@kangc/v-md-editor';
-
-//@ts-ignore
-import enUS from '@kangc/v-md-editor/lib/lang/en-US';
-
-// highlightjs
-import hljs from 'highlight.js';
-
-VMdEditor.use(githubTheme,{
-    Hljs: hljs,
-}).lang.use('en-US', enUS);
+import { MdEditor } from 'md-editor-v3';
+import 'md-editor-v3/lib/style.css';
 
 const props = defineProps<{
     item?: Item,
@@ -167,17 +153,17 @@ const removePhoto = (photoId: number) => {
 
                     <div class="mt-4">
                         <span class="font-bold ms-2">Description</span>
-                        <v-md-editor v-model="form.description" height="300px"></v-md-editor>
+                        <MdEditor v-model="form.description" height="300px"></MdEditor>
                     </div>
 
                     <div class="mt-4">
                         <span class="font-bold ms-2">Card Description</span>
-                        <v-md-editor v-model="form.card_description" height="300px"></v-md-editor>
+                        <MdEditor v-model="form.card_description" height="300px"></MdEditor>
                     </div>
 
                     <div class="mt-4">
                         <span class="font-bold ms-2">Wiring Instructions</span>
-                        <v-md-editor v-model="form.wiring_instructions" height="300px"></v-md-editor>
+                        <MdEditor v-model="form.wiring_instructions" height="300px"></MdEditor>
                     </div>
 
                     <div class="mt-4">
@@ -193,27 +179,27 @@ const removePhoto = (photoId: number) => {
 
                     <div class="mt-4">
                         <span class="font-bold ms-2">Pros</span>
-                        <v-md-editor v-model="form.pros" height="300px"></v-md-editor>
+                        <MdEditor v-model="form.pros" height="300px"></MdEditor>
                     </div>
 
                     <div class="mt-4">
                         <span class="font-bold ms-2">Cons</span>
-                        <v-md-editor v-model="form.cons" height="300px"></v-md-editor>
+                        <MdEditor v-model="form.cons" height="300px"></MdEditor>
                     </div>
 
                     <div class="mt-4">
                         <span class="font-bold ms-2">Hardware Considerations</span>
-                        <v-md-editor v-model="form.hardware_considerations" height="300px"></v-md-editor>
+                        <MdEditor v-model="form.hardware_considerations" height="300px"></MdEditor>
                     </div>
 
                     <div class="mt-4">
                         <span class="font-bold ms-2">Software Considerations</span>
-                        <v-md-editor v-model="form.software_considerations" height="300px"></v-md-editor>
+                        <MdEditor v-model="form.software_considerations" height="300px"></MdEditor>
                     </div>
 
                     <div class="mt-4">
                         <span class="font-bold ms-2">Example Code</span>
-                        <v-md-editor v-model="form.example_code" height="300px"></v-md-editor>
+                        <MdEditor v-model="form.example_code" height="300px"></MdEditor>
                     </div>
                 </card>
                 <card class="col-span-1">
