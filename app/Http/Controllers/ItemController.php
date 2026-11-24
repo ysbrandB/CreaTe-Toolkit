@@ -64,7 +64,7 @@ class ItemController extends Controller
         $photo?->storeAs('photos/'.$photo->hashName(), ['disk' => 'public']);
         $wiringPhoto = $request->file('wiring_photo');
         $wiringPhoto?->storeAs('photos/'.$photo->hashName(), ['disk' => 'public']);
-        $item = new Item();
+        $item = new Item;
         $item->fill($request->except('attributes', 'photo', 'wiring_photo', 'json_items'));
 
         $item->json_items = $request->input('edges') ?? [];
@@ -108,7 +108,7 @@ class ItemController extends Controller
                 $query->where('items.id', $id);
             })->select('attribute_type_id', 'id');
         }])->select('id')->get();
-        $myAttributes = new \stdClass();
+        $myAttributes = new \stdClass;
         foreach ($attributeTypes as $attributeType) {
             $myAttributes->{$attributeType->id} = $attributeType->attributes->pluck('id');
         }
@@ -131,7 +131,7 @@ class ItemController extends Controller
         if ($photo) {
             $photo->storeAs('photos/'.$photo->hashName(), ['disk' => 'public']);
             if ($item->photo) {
-                //delete the old photo
+                // delete the old photo
                 Storage::disk('public')->delete('photos/'.$item->photo);
             }
 
@@ -143,7 +143,7 @@ class ItemController extends Controller
             $wiring_photo->storeAs('photos/'.$wiring_photo->hashName(), ['disk' => 'public']);
 
             if ($item->wiring_photo) {
-                //delete the old photo
+                // delete the old photo
                 Storage::disk('public')->delete('photos/'.$item->wiring_photo);
             }
 
@@ -165,12 +165,12 @@ class ItemController extends Controller
     {
         $item = Item::findOrFail($id);
         if ($item->photo) {
-            //delete the old photo
+            // delete the old photo
             Storage::disk('public')->delete('photos/'.$item->photo);
         }
 
         if ($item->wiring_photo) {
-            //delete the old photo
+            // delete the old photo
             Storage::disk('public')->delete('photos/'.$item->wiring_photo);
         }
 

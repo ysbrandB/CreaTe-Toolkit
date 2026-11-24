@@ -24,7 +24,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        //add new pivot table called attribute_items
+        // add new pivot table called attribute_items
         Schema::create('attribute_item', function (Blueprint $table) {
             $table->id();
             $table->foreignId('attribute_id')->constrained();

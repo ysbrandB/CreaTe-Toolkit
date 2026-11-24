@@ -27,9 +27,7 @@ class AttributeTypeController extends Controller
         return to_route('attribute_types.edit', $id);
     }
 
-    public function show($id)
-    {
-    }
+    public function show($id) {}
 
     public function edit($id)
     {

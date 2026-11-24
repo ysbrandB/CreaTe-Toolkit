@@ -27,7 +27,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //reverse up
+        // reverse up
         Schema::table('items', function ($table) {
             $table->text('description')->change();
             $table->text('card_description')->change();

@@ -5,15 +5,19 @@ use App\Http\Controllers\AttributeTypeController;
 use App\Http\Controllers\GraphController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\PhotoController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuestionController;
+use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\Item;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use Inertia\Response;
 
 Route::resource('items', ItemController::class)->except(['show', 'index'])->middleware('auth');
 Route::resource('items.photos', PhotoController::class)->only(['store', 'destroy'])->middleware('auth');
-//item route that takes the hashid and returns the item
+// item route that takes the hashid and returns the item
 Route::get('/', static fn (Request $request) => new ItemController()->index($request))->name('items.index');
 Route::group(['prefix' => 'items'], static function (): void {
     Route::get('/item/{public_id}', static fn (string $publicId) => new ItemController()->show($publicId))->name('items.show');
@@ -32,9 +36,9 @@ Route::group(['prefix' => 'graph'], static function (): void {
 Route::get('/dashboard', static fn () => Inertia::render('Dashboard'))->name('dashboard');
 
 Route::middleware('auth')->group(static function (): void {
-    Route::get('/profile', static fn (Request $request): \Inertia\Response => new \App\Http\Controllers\ProfileController()->edit($request))->name('profile.edit');
-    Route::patch('/profile', static fn (\App\Http\Requests\ProfileUpdateRequest $profileUpdateRequest): \Illuminate\Http\RedirectResponse => new \App\Http\Controllers\ProfileController()->update($profileUpdateRequest))->name('profile.update');
-    Route::delete('/profile', static fn (Request $request): \Illuminate\Http\RedirectResponse => new \App\Http\Controllers\ProfileController()->destroy($request))->name('profile.destroy');
+    Route::get('/profile', static fn (Request $request): Response => new ProfileController()->edit($request))->name('profile.edit');
+    Route::patch('/profile', static fn (ProfileUpdateRequest $profileUpdateRequest): RedirectResponse => new ProfileController()->update($profileUpdateRequest))->name('profile.update');
+    Route::delete('/profile', static fn (Request $request): RedirectResponse => new ProfileController()->destroy($request))->name('profile.destroy');
 });
 
 require __DIR__.'/auth.php';
