@@ -18,7 +18,7 @@ class ItemFactory extends Factory
     public function definition(): array
     {
         return [
-            'title' => $this->faker->name,
+            'title' => $this->faker->firstName(),
             'description' => $this->faker->paragraph,
             'card_description' => $this->faker->text,
             'photo' => 'markus-spiske-QozzJpFZ2lg-unsplash.jpg',
