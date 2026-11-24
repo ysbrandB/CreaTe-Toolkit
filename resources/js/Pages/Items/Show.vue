@@ -10,10 +10,6 @@ import OpeningCard from "@/CustomComponents/OpeningCard.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import NavLink from "@/Components/NavLink.vue";
 
-import QrcodeVue from 'qrcode.vue'
-
-import Pill from "@/CustomComponents/Pill.vue";
-import HighlightJSVuePlugin from '@highlightjs/vue-plugin';
 import 'highlight.js/lib/common';
 import 'highlight.js/styles/atom-one-dark.css';
 import hljs from 'highlight.js';
