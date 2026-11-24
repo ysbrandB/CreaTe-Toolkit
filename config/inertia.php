@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
 
     /*
@@ -21,11 +23,11 @@ return [
 
     'ssr' => [
 
-        'enabled' => (bool) env('INERTIA_SSR_ENABLED', true),
+        'enabled' => (bool) env('INERTIA_SSR_ENABLED', default: true),
 
         'runtime' => env('INERTIA_SSR_RUNTIME', 'node'),
 
-        'ensure_runtime_exists' => (bool) env('INERTIA_SSR_ENSURE_RUNTIME_EXISTS', false),
+        'ensure_runtime_exists' => (bool) env('INERTIA_SSR_ENSURE_RUNTIME_EXISTS', default: false),
 
         'url' => env('INERTIA_SSR_URL', 'http://127.0.0.1:13714'),
 
@@ -33,7 +35,7 @@ return [
 
         'timeout' => env('INERTIA_SSR_TIMEOUT'),
 
-        'ensure_bundle_exists' => (bool) env('INERTIA_SSR_ENSURE_BUNDLE_EXISTS', true),
+        'ensure_bundle_exists' => (bool) env('INERTIA_SSR_ENSURE_BUNDLE_EXISTS', default: true),
 
         // 'bundle' => base_path('bootstrap/ssr/ssr.mjs'),
 
@@ -51,7 +53,7 @@ return [
         |
         */
 
-        'throw_on_error' => (bool) env('INERTIA_SSR_THROW_ON_ERROR', false),
+        'throw_on_error' => (bool) env('INERTIA_SSR_THROW_ON_ERROR', default: false),
 
     ],
 
@@ -152,7 +154,7 @@ return [
 
     'history' => [
 
-        'encrypt' => (bool) env('INERTIA_ENCRYPT_HISTORY', false),
+        'encrypt' => (bool) env('INERTIA_ENCRYPT_HISTORY', default: false),
 
     ],
 
@@ -228,6 +230,6 @@ return [
     |
     */
 
-    'preserve_big_integers' => (bool) env('INERTIA_PRESERVE_BIG_INTEGERS', false),
+    'preserve_big_integers' => (bool) env('INERTIA_PRESERVE_BIG_INTEGERS', default: false),
 
 ];
